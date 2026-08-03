@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aventuras | Illariy Travel</title>
+  <link rel="icon" href="assets/img/logo.png" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0A0A0A;
+      color: #E5E5E5;
+    }
+    h1, h2, h3, .font-heading {
+      font-family: 'Montserrat', sans-serif;
+    }
+    .hero-illariy {
+      background: linear-gradient(125deg, #7F1D1D 0%, #991B1B 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-illariy::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path fill="white" d="M20,20 L30,10 L40,20 L30,30 Z M70,30 L80,20 L90,30 L80,40 Z M45,70 L55,60 L65,70 L55,80 Z"/></svg>');
+      background-repeat: repeat;
+      pointer-events: none;
+    }
+    .filter-sidebar {
+      background: #121212;
+      border-radius: 1.5rem;
+      padding: 1.8rem;
+      border: 1px solid #2C2C2C;
+      position: sticky;
+      top: 100px;
+    }
+    .filter-sidebar select, .filter-sidebar input {
+      background: #1F1F1F;
+      border: 1px solid #3F3F3F;
+      border-radius: 14px;
+      padding: 10px 14px;
+      width: 100%;
+      color: white;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .filter-sidebar select:focus, .filter-sidebar input:focus {
+      border-color: #DC2626;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(220,38,38,0.3);
+    }
+    .card-paquete {
+      background: #18181B;
+      border: 1px solid #2C2C2C;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s, box-shadow 0.2s;
+    }
+    .card-paquete:hover {
+      transform: translateY(-6px);
+      border-color: #DC2626;
+      box-shadow: 0 20px 25px -12px rgba(220,38,38,0.25);
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #2A2A2A 25%, #3F3F3F 50%, #2A2A2A 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 1rem;
+    }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    .btn-reservar {
+      background: #B91C1C;
+      transition: all 0.2s;
+    }
+    .btn-reservar:hover {
+      background: #991B1B;
+      transform: scale(0.98);
+    }
+    @media (max-width: 768px) {
+      .filter-sidebar { position: relative; top: 0; margin-bottom: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="bg-black/80 backdrop-blur-md border-b border-red-900/40 sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/img/logo.png" alt="Illariy Travel" class="h-8 w-auto">
+        <span class="text-2xl font-extrabold tracking-tight"><span class="text-red-600">ILLARIY</span> <span class="text-white font-light">Travel</span></span>
+      </a>
+      <div class="flex items-center gap-5 text-sm font-semibold">
+        <a href="index.html" class="text-gray-300 hover:text-red-400 transition">Inicio</a>
+        <a href="destinos.html" class="text-red-500 border-b-2 border-red-500 pb-1">Aventuras</a>
+        <a href="galeria.html" class="text-gray-300 hover:text-red-400 transition">Galería</a>
+        <a href="registro.html" class="bg-red-700 hover:bg-red-800 text-white px-5 py-2 rounded-full transition shadow-md">Registrarse</a>
+        <a href="https://www.facebook.com/illariytravel" target="_blank" class="text-gray-400 hover:text-red-500 text-lg"><i class="fab fa-facebook-f"></i></a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero-illariy py-20 px-4 text-center">
+    <div class="max-w-4xl mx-auto relative z-10">
+      <p class="text-red-200 font-bold uppercase tracking-widest text-sm"><i class="fas fa-compass mr-2"></i> Elige tu ruta</p>
+      <h1 class="text-5xl md:text-6xl font-black mt-3 leading-tight">Paquetes <span class="text-red-300">Illariy</span></h1>
+      <p class="text-gray-200 text-lg max-w-xl mx-auto mt-5">Desde la sierra hasta la selva, vive experiencias auténticas con guías locales.</p>
+    </div>
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL: FILTROS LATERALES + GRID -->
+  <div class="container mx-auto px-6 py-12">
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- SIDEBAR FILTROS (bien estructurado) -->
+      <aside class="lg:w-80 filter-sidebar">
+        <h3 class="text-xl font-black mb-5 flex items-center gap-2"><i class="fas fa-sliders-h text-red-500"></i> Filtrar</h3>
+        
+        <div class="mb-5">
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Buscar destino</label>
+          <input type="text" id="search-input" placeholder="Ej: Huaytapallana, Oxapampa..." class="w-full">
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Tipo de aventura</label>
+          <select id="filter-tipo" class="w-full">
+            <option value="todos">Todos</option>
+          </select>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Duración</label>
+          <select id="filter-duracion" class="w-full">
+            <option value="todos">Cualquiera</option>
+            <option value="1-dia">1 día completo</option>
+            <option value="varios">2+ días</option>
+          </select>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Ordenar por</label>
+          <select id="filter-sort" class="w-full">
+            <option value="default">Relevancia</option>
+            <option value="precio-asc">Precio: menor a mayor</option>
+            <option value="precio-desc">Precio: mayor a menor</option>
+            <option value="nombre-asc">Nombre A → Z</option>
+          </select>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-zinc-800 text-center">
+          <span id="paquetes-count" class="text-sm font-semibold text-gray-400"></span>
+        </div>
+      </aside>
+
+      <!-- GRID DE PAQUETES -->
+      <main class="flex-1">
+        <!-- SKELETON LOADING -->
+        <div id="paquetes-skeleton" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="card-paquete"><div class="skeleton h-52 w-full"></div><div class="p-5 space-y-3"><div class="skeleton h-5 w-3/4"></div><div class="skeleton h-3 w-full"></div><div class="skeleton h-10 w-full mt-4"></div></div></div>
+          <div class="card-paquete"><div class="skeleton h-52 w-full"></div><div class="p-5 space-y-3"><div class="skeleton h-5 w-3/4"></div><div class="skeleton h-3 w-full"></div><div class="skeleton h-10 w-full mt-4"></div></div></div>
+          <div class="card-paquete"><div class="skeleton h-52 w-full"></div><div class="p-5 space-y-3"><div class="skeleton h-5 w-3/4"></div><div class="skeleton h-3 w-full"></div><div class="skeleton h-10 w-full mt-4"></div></div></div>
+        </div>
+        <div id="paquetes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" style="display: none;"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-black border-t border-red-900/30 py-8 mt-16">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+      <div class="text-xl font-extrabold"><span class="text-red-600">ILLARIY</span> <span class="text-white font-light">Travel</span></div>
+      <div class="flex gap-6"><a href="#" class="hover:text-red-400">Política de privacidad</a><a href="#" class="hover:text-red-400">Términos y condiciones</a></div>
+      <p>© 2018 Illariy Peru Travel Group Huancayo</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      const API_BASE = 'https://localhost:7047/api';
+      const grid = document.getElementById('paquetes-grid');
+      const searchInput = document.getElementById('search-input');
+      const filterTipo = document.getElementById('filter-tipo');
+      const filterSort = document.getElementById('filter-sort');
+      const filterDuracion = document.getElementById('filter-duracion');
+      const contadorEl = document.getElementById('paquetes-count');
+      const skeletonEl = document.getElementById('paquetes-skeleton');
+
+      let todosLosPaquetes = [];
+
+      fetch(`${API_BASE}/Paquete`)
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(paquetes => {
+          todosLosPaquetes = paquetes;
+          if(skeletonEl) skeletonEl.style.display = 'none';
+          grid.style.display = 'grid';
+          renderPaquetes(todosLosPaquetes);
+          poblarFiltros(todosLosPaquetes);
+        })
+        .catch(() => {
+          if(skeletonEl) skeletonEl.style.display = 'none';
+          grid.innerHTML = `<div class="col-span-full text-center py-20"><i class="fas fa-exclamation-triangle text-5xl text-red-500 mb-4"></i><p class="text-lg font-semibold">Error al cargar paquetes</p><p class="text-gray-400">Verifica que el servidor esté en ejecución en ${API_BASE}</p></div>`;
+          grid.style.display = 'grid';
+        });
+
+      function renderPaquetes(lista) {
+        grid.innerHTML = '';
+        if(lista.length === 0) {
+          grid.innerHTML = `<div class="col-span-full text-center py-16"><i class="fas fa-search text-4xl text-gray-500 mb-3"></i><p class="font-semibold">No hay resultados</p><p class="text-gray-400 text-sm">Prueba con otros filtros</p></div>`;
+          contadorEl.innerText = '0 paquetes';
+          return;
+        }
+        contadorEl.innerText = `${lista.length} paquete${lista.length !== 1 ? 's' : ''}`;
+        lista.forEach(pkg => {
+          const id = pkg.iD_Paquete;
+          const nombre = pkg.nombre || 'Sin nombre';
+          const desc = pkg.descripcion || '';
+          const precio = parseFloat(pkg.precio_Base || 0);
+          const duracion = pkg.duracion || '';
+          const imagen = pkg.imagen && pkg.imagen.trim() !== '' ? pkg.imagen : 'assets/img/bus.jpg';
+          const tipo = pkg.tipo || 'Tour';
+
+          const card = document.createElement('div');
+          card.className = 'card-paquete';
+          card.innerHTML = `
+            <div class="relative overflow-hidden">
+              <img src="${imagen}" alt="${nombre}" class="w-full h-52 object-cover transition-transform duration-500 hover:scale-105" onerror="this.src='assets/img/viaje.jpeg'">
+              <div class="absolute top-3 left-3 bg-red-700 text-white text-xs font-bold px-2.5 py-1 rounded-full uppercase">${tipo}</div>
+              <div class="absolute top-3 right-3 bg-black/70 text-white text-sm font-black px-3 py-1 rounded-full">S/ ${precio.toFixed(2)}</div>
+            </div>
+            <div class="p-5 flex flex-col">
+              <h3 class="text-xl font-bold mb-1">${nombre}</h3>
+              <p class="text-gray-400 text-sm line-clamp-2 mb-3">${desc}</p>
+              <div class="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                <i class="far fa-clock text-red-500"></i> ${duracion || 'Flexible'}
+              </div>
+              <a href="destino-single.html?iD_Paquete=${id}" class="btn-reservar text-center text-white font-bold py-2.5 rounded-xl transition">Reservar ahora →</a>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+
+      function poblarFiltros(paquetes) {
+        if(!filterTipo) return;
+        const tipos = [...new Set(paquetes.map(p => p.tipo).filter(Boolean))];
+        tipos.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t.toLowerCase();
+          opt.innerText = t;
+          filterTipo.appendChild(opt);
+        });
+      }
+
+      function aplicarFiltros() {
+        const texto = (searchInput?.value || '').toLowerCase().trim();
+        const tipoVal = filterTipo?.value || 'todos';
+        const sortVal = filterSort?.value || 'default';
+        const durVal = filterDuracion?.value || 'todos';
+
+        let resultado = todosLosPaquetes.filter(p => {
+          const nomMatch = (p.nombre || '').toLowerCase().includes(texto);
+          const descMatch = (p.descripcion || '').toLowerCase().includes(texto);
+          const tipoMatch = tipoVal === 'todos' || (p.tipo || '').toLowerCase() === tipoVal;
+          let durMatch = true;
+          const duracion = (p.duracion || '').toLowerCase();
+          if(durVal === '1-dia') durMatch = duracion.includes('1 día') || duracion === '1 día';
+          else if(durVal === 'varios') durMatch = /[2-9]\s*días/.test(duracion);
+          return (nomMatch || descMatch) && tipoMatch && durMatch;
+        });
+
+        switch(sortVal) {
+          case 'precio-asc': resultado.sort((a,b) => (a.precio_Base||0) - (b.precio_Base||0)); break;
+          case 'precio-desc': resultado.sort((a,b) => (b.precio_Base||0) - (a.precio_Base||0)); break;
+          case 'nombre-asc': resultado.sort((a,b) => (a.nombre||'').localeCompare(b.nombre||'')); break;
+        }
+        renderPaquetes(resultado);
+      }
+
+      searchInput?.addEventListener('input', aplicarFiltros);
+      filterTipo?.addEventListener('change', aplicarFiltros);
+      filterSort?.addEventListener('change', aplicarFiltros);
+      filterDuracion?.addEventListener('change', aplicarFiltros);
+    })();
+  </script>
+</body>
+<script src="assets/js/chatbot.js"></script>
+</html>

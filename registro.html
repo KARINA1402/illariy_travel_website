@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro – Illariy Travel</title>
+  <link rel="icon" href="assets/img/logo.png" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0A0A0A; color: #E5E5E5; }
+    .hero-registro {
+      background: linear-gradient(135deg, #7F1D1D 0%, #B91C1C 100%);
+      position: relative;
+    }
+    .field { background: #1F1F1F; border: 1px solid #3F3F3F; border-radius: 12px; padding: 12px 16px 12px 44px; width: 100%; color: white; transition: border 0.2s; }
+    .field:focus { border-color: #EF4444; outline: none; box-shadow: 0 0 0 2px rgba(239,68,68,0.3); }
+    .field-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #9CA3AF; }
+    .btn-submit { background: #DC2626; transition: all 0.2s; }
+    .btn-submit:hover { background: #B91C1C; transform: scale(1.01); }
+
+    /* Spinner y mensajes RENIEC */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-top-color: #EF4444;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .dni-msg {
+      font-size: 12px;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dni-msg.ok { color: #10B981; }
+    .dni-msg.err { color: #EF4444; }
+    .dni-msg.warn { color: #F59E0B; }
+    .verificape-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(16,185,129,0.1);
+      color: #10B981;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 20px;
+      border: 1px solid #10B981;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="bg-black/90 border-b border-red-900/40 sticky top-0 z-50 backdrop-blur">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/img/logo.png" alt="Illariy Travel" class="h-8 w-auto">
+        <span class="text-2xl font-extrabold"><span class="text-red-600">ILLARIY</span> <span class="text-white font-light">Travel</span></span>
+      </a>
+      <div class="flex items-center gap-5 text-sm font-semibold">
+        <a href="index.html" class="text-gray-300 hover:text-red-400">Inicio</a>
+        <a href="destinos.html" class="text-gray-300 hover:text-red-400">Aventuras</a>
+        <a href="galeria.html" class="text-gray-300 hover:text-red-400">Galería</a>
+        <a href="https://www.facebook.com/illariytravel" target="_blank" class="text-gray-400 hover:text-red-500"><i class="fab fa-facebook-f"></i></a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="hero-registro text-white py-16 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <p class="text-red-200 font-bold uppercase tracking-widest text-sm"><i class="fas fa-user-plus mr-2"></i>Únete a la tribu</p>
+      <h1 class="text-4xl md:text-5xl font-black mt-2">Se parte de <span class="text-red-300">Illariy</span></h1>
+      <p class="text-gray-200 max-w-xl mx-auto mt-4">Accede a promociones exclusivas, reservas rápidas y tu historial de viajes.</p>
+    </div>
+  </div>
+
+  <main class="container mx-auto px-4 py-12 max-w-xl">
+    <div class="bg-zinc-900 rounded-2xl border border-red-800/40 p-8 shadow-2xl">
+      <h2 class="text-2xl font-black mb-6 text-white">Formulario de registro</h2>
+      <form id="registerForm" class="space-y-5">
+
+        <!-- DNI / Pasaporte (con verificación RENIEC) -->
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase">DNI / Pasaporte <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <i class="fas fa-id-card field-icon"></i>
+            <input type="text" id="pasaporte" class="field" placeholder="Número de documento" required
+                   onblur="verificarDNIReniec(this.value.trim())" />
+            <span id="dni-spinner" class="hidden" style="position:absolute; right:14px; top:50%; transform:translateY(-50%);">
+              <div class="spinner"></div>
+            </span>
+          </div>
+          <div id="dni-msg" class="dni-msg"></div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase">Nombre</label>
+            <div class="relative"><i class="fas fa-user field-icon"></i><input type="text" id="nombre" class="field" placeholder="Tu nombre" required></div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase">Apellido</label>
+            <div class="relative"><i class="fas fa-user field-icon"></i><input type="text" id="apellido" class="field" placeholder="Apellido" required></div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase">Correo electrónico</label>
+          <div class="relative"><i class="fas fa-envelope field-icon"></i><input type="email" id="correo" class="field" placeholder="correo@ejemplo.com" required></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase">Teléfono</label>
+          <div class="relative"><i class="fas fa-phone field-icon"></i><input type="tel" id="telefono" class="field" placeholder="+51 990 693 358" required></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase">Dirección</label>
+          <div class="relative"><i class="fas fa-map-marker-alt field-icon"></i><input type="text" id="direccion" class="field" placeholder="Jr.Puno 293, Huancayo" required></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase">Fecha de nacimiento</label>
+          <div class="relative"><i class="fas fa-calendar field-icon"></i><input type="date" id="fecha_Nacimiento" class="field" required></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase">Nacionalidad</label>
+          <div class="relative"><i class="fas fa-flag field-icon"></i><input type="text" id="nacionalidad" class="field" placeholder="Peruana" required></div>
+        </div>
+
+        <button type="submit" class="w-full btn-submit text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2">
+          <i class="fas fa-user-plus"></i> Registrarme
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-zinc-900 border border-red-700 p-8 rounded-2xl text-center max-w-md w-full relative">
+      <button onclick="cerrarModal()" class="absolute top-3 right-4 text-gray-400 hover:text-red-500 text-2xl">&times;</button>
+      <div id="modalIcon" class="text-5xl mb-4">✅</div>
+      <p id="modalMensaje" class="text-lg font-bold text-white mb-3"></p>
+      <p id="cuentaRegresiva" class="text-3xl font-black text-red-500"></p>
+    </div>
+  </div>
+
+  <footer class="bg-black border-t border-red-900/30 py-6 mt-8">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+      <div class="text-xl font-extrabold"><span class="text-red-600">ILLARIY</span> <span class="text-white font-light">Travel</span></div>
+      <div class="flex gap-6"><a href="#" class="hover:text-red-400">Política de privacidad</a><a href="#" class="hover:text-red-400">Términos</a></div>
+      <p>© 2018 Illariy Peru Travel Group Huancayo</p>
+    </div>
+  </footer>
+
+  <script>
+    // ═══════════════════ CONFIGURACIÓN VERIFICAPE ═══════════════════
+    const VERIFICAPE_TOKEN = 'vp_live_aada01fa0e4c4fa290b3e042fc612bb8';
+    const VERIFICAPE_API   = 'https://corsproxy.io/?https://api.verificape.com/v2/dni';
+    let dniCache = {};
+
+    async function verificarDNIReniec(dni) {
+      if (!dni || dni.length < 8) return;
+
+      const msgEl = document.getElementById('dni-msg');
+      const spinnerEl = document.getElementById('dni-spinner');
+
+      spinnerEl.classList.remove('hidden');
+      msgEl.innerHTML = '<span class="spinner" style="width:12px;height:12px;"></span> Verificando datos...';
+      msgEl.className = 'dni-msg warn';
+
+      // Caché
+      if (dni in dniCache) {
+        spinnerEl.classList.add('hidden');
+        if (dniCache[dni].success) {
+          rellenarDatosReniec(dniCache[dni].data);
+          msgEl.innerHTML = `<i class="fas fa-check-circle"></i> Datos verificados con RENIEC <span class="verificape-badge"><i class="fas fa-shield-check"></i>VerificaPE</span>`;
+          msgEl.className = 'dni-msg ok';
+        } else {
+          msgEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${dniCache[dni].error || 'No se encontraron datos. Completa manualmente.'}`;
+          msgEl.className = 'dni-msg warn';
+        }
+        return;
+      }
+
+      try {
+        const response = await fetch(`${VERIFICAPE_API}/${dni}`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${VERIFICAPE_TOKEN}` }
+        });
+
+        spinnerEl.classList.add('hidden');
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          const mensaje = errorData.message || 'No se encontraron datos en RENIEC.';
+          dniCache[dni] = { success: false, error: mensaje };
+          msgEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${mensaje}`;
+          msgEl.className = 'dni-msg warn';
+          return;
+        }
+
+        const responseData = await response.json();
+        if (!responseData.success || !responseData.data) {
+          throw new Error('La API no devolvió datos válidos');
+        }
+
+        const persona = responseData.data;
+        dniCache[dni] = { success: true, data: persona };
+        rellenarDatosReniec(persona);
+        msgEl.innerHTML = `<i class="fas fa-check-circle"></i> Datos verificados con RENIEC <span class="verificape-badge"><i class="fas fa-shield-check"></i>VerificaPE</span>`;
+        msgEl.className = 'dni-msg ok';
+
+      } catch (error) {
+        console.error('Error en verificación DNI:', error);
+        spinnerEl.classList.add('hidden');
+        dniCache[dni] = { success: false, error: 'Error de conexión. Completa los datos manualmente.' };
+        msgEl.innerHTML = `<i class="fas fa-times-circle"></i> Error de conexión. Completa los datos manualmente.`;
+        msgEl.className = 'dni-msg err';
+      }
+    }
+
+    function rellenarDatosReniec(persona) {
+      const nombre = persona.names || '';
+      const apellidoPaterno = persona.paternalSurname || '';
+      const apellidoMaterno = persona.maternalSurname || '';
+      const apellidoCompleto = `${apellidoPaterno} ${apellidoMaterno}`.trim();
+      const fechaNacRaw = persona.birthDate || ''; // "DD/MM/YYYY"
+
+      let fechaFormateada = '';
+      if (fechaNacRaw && fechaNacRaw.includes('/')) {
+        const partes = fechaNacRaw.split('/');
+        if (partes.length === 3) {
+          const dia = partes[0].padStart(2, '0');
+          const mes = partes[1].padStart(2, '0');
+          const anio = partes[2];
+          fechaFormateada = `${anio}-${mes}-${dia}`;
+        }
+      }
+
+      if (nombre) document.getElementById('nombre').value = nombre;
+      if (apellidoCompleto) document.getElementById('apellido').value = apellidoCompleto;
+      if (fechaFormateada) document.getElementById('fecha_Nacimiento').value = fechaFormateada;
+      document.getElementById('nacionalidad').value = 'Peruana';
+    }
+
+    // ═══════════════════ LÓGICA ORIGINAL DEL REGISTRO ═══════════════════
+    function mostrarModal(mensaje, redirigir = false, esError = false) {
+      const modal = document.getElementById("modal");
+      const icon = document.getElementById("modalIcon");
+      const mensajeElemento = document.getElementById("modalMensaje");
+      const cuenta = document.getElementById("cuentaRegresiva");
+
+      icon.textContent = esError ? "⚠️" : "✅";
+      mensajeElemento.innerText = mensaje;
+      cuenta.innerText = "";
+      modal.classList.remove("hidden");
+      modal.style.display = "flex";
+
+      if (redirigir) {
+        let contador = 3;
+        cuenta.innerText = contador;
+        const intervalo = setInterval(() => {
+          contador--;
+          cuenta.innerText = contador;
+          if (contador === 0) {
+            clearInterval(intervalo);
+            window.location.href = "index.html";
+          }
+        }, 1000);
+      }
+    }
+
+    function cerrarModal() {
+      document.getElementById("modal").classList.add("hidden");
+      document.getElementById("modal").style.display = "none";
+    }
+
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const correoInput = document.getElementById("correo").value.trim().toLowerCase();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(correoInput)) {
+        mostrarModal("Por favor, ingresa un correo electrónico válido.", false, true);
+        return;
+      }
+
+      let fechaNacimiento = document.getElementById("fecha_Nacimiento").value;
+      let fechaFormateada = "";
+      if (fechaNacimiento) {
+        const [anio, mes, dia] = fechaNacimiento.split("-");
+        fechaFormateada = `${dia}/${mes}/${anio}`;
+      }
+
+      const cliente = {
+        iD_Usuario: 1,
+        frecuencia_Viajero: "Normal",
+        nombre: document.getElementById("nombre").value,
+        apellido: document.getElementById("apellido").value,
+        correo: correoInput,
+        telefono: document.getElementById("telefono").value,
+        direccion: document.getElementById("direccion").value,
+        fecha_Nacimiento: fechaFormateada,
+        nacionalidad: document.getElementById("nacionalidad").value,
+        pasaporte: document.getElementById("pasaporte").value,
+      };
+
+      fetch(`https://localhost:7047/api/Cliente/email?correo=${encodeURIComponent(cliente.correo)}`)
+        .then(checkRes => {
+          if (checkRes.ok) {
+            throw new Error("Ya eres un cliente registrado.");
+          } else if (checkRes.status === 404) {
+            return fetch("https://localhost:7047/api/Cliente", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(cliente)
+            });
+          } else {
+            throw new Error("Error al verificar el correo.");
+          }
+        })
+        .then(response => {
+          if (response && response.ok) {
+            mostrarModal("¡Ya formas parte de Illariy Travel! Serás redirigido al inicio en...", true);
+          } else {
+            return response.text().then(text => {
+              throw new Error("Error al registrar: " + text);
+            });
+          }
+        })
+        .catch(error => {
+          mostrarModal(error.message.includes("Ya eres un cliente") ? "Ya eres un cliente registrado." : error.message, false, true);
+        });
+    });
+  </script>
+</body>
+<script src="assets/js/chatbot.js"></script>
+</html>

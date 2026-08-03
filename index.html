@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Illariy Travel – Aventura y naturaleza en Perú</title>
+  <link rel="icon" href="assets/img/logo.png" type="image/x-icon">
+  <!-- Google Fonts: Montserrat + Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0A0A0A;
+      color: #F5F5F5;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+    }
+    .bg-illariy { background-color: #B91C1C; }
+    .text-illariy { color: #B91C1C; }
+    .border-illariy { border-color: #B91C1C; }
+    .btn-illariy {
+      background-color: #B91C1C;
+      transition: all 0.2s ease;
+    }
+    .btn-illariy:hover {
+      background-color: #991B1B;
+      transform: translateY(-2px);
+    }
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 30px -12px rgba(185, 28, 28, 0.2);
+    }
+    .hero-pattern {
+      background: radial-gradient(circle at 20% 30%, rgba(185,28,28,0.15) 0%, rgba(0,0,0,0.9) 90%);
+    }
+    /* Override tailwind para dark mode básico */
+    .dark\:bg-zinc-900 { background-color: #0A0A0A; }
+    .dark\:text-white { color: #F5F5F5; }
+  </style>
+</head>
+<body class="bg-black text-gray-200">
+
+  <!-- NAVBAR (rojo oscuro, minimalista) -->
+  <nav class="bg-black/80 backdrop-blur-md border-b border-red-900/40 sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/img/logo.png" alt="Illariy Travel" class="h-8 w-auto">
+        <span class="text-2xl font-extrabold tracking-tight">
+          <span class="text-red-600">ILLARIY</span> 
+          <span class="text-white font-light">Travel</span>
+        </span>
+      </a>
+      <div class="flex items-center gap-5 text-sm font-semibold">
+        <a href="index.html" class="text-red-500 border-b-2 border-red-500 pb-1">Inicio</a>
+        <a href="destinos.html" class="text-gray-300 hover:text-red-400 transition">Aventuras</a>
+        <a href="galeria.html" class="text-gray-300 hover:text-red-400 transition">Galería</a>
+        <a href="registro.html" class="bg-red-700 hover:bg-red-800 text-white px-5 py-2 rounded-full transition shadow-lg">Registrarse</a>
+        <a href="https://www.facebook.com/illariytravel" target="_blank" class="text-gray-400 hover:text-red-500 text-lg"><i class="fab fa-facebook-f"></i></a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO con video y capa rojiza asimétrica -->
+  <section class="relative overflow-hidden">
+    <video autoplay muted loop class="w-full h-[550px] object-cover">
+      <source src="assets/video/presentación.mp4" type="video/webm">
+    </video>
+    <div class="absolute inset-0 hero-pattern flex items-center">
+      <div class="container mx-auto px-6 md:px-12 text-left">
+        <p class="text-red-400 font-bold uppercase tracking-widest text-sm mb-3 flex items-center gap-2">
+          <i class="fas fa-mountain"></i> Tierra de aventuras
+        </p>
+        <h1 class="text-5xl md:text-7xl font-black leading-tight max-w-3xl">
+          Vive el <span class="text-red-500">latido</span> <br> de los Andes
+        </h1>
+        <p class="text-gray-300 text-lg max-w-xl mt-4 mb-8">Desde lagunas escondidas hasta puentes colgantes. Explora Junín, Pasco y la selva central con guías locales.</p>
+        <a href="https://wa.me/51990693358?text=Hola%20quiero%20información%20sobre%20los%20paquetes%20turísticos"
+          class="inline-flex items-center gap-3 bg-red-700 hover:bg-red-800 text-white font-bold px-8 py-4 rounded-full transition shadow-xl" target="_blank">
+          <i class="fab fa-whatsapp text-xl"></i> Reserva tu experiencia
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOUR DESTACADO (NOR YAUYOS – ejemplo nuevo) -->
+  <section class="py-20 bg-gradient-to-b from-black to-zinc-900">
+    <div class="container mx-auto px-6">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="order-2 md:order-1">
+          <span class="text-red-500 text-sm font-bold uppercase tracking-wider"><i class="fas fa-hiking mr-2"></i>Tour Estrella</span>
+          <h2 class="text-4xl md:text-5xl font-black mt-2 mb-4">Nor Yauyos –<br> Puente colgante y lagunas ocultas</h2>
+          <div class="flex flex-wrap gap-4 text-sm mb-5">
+            <span class="bg-red-900/30 px-4 py-2 rounded-full"><i class="far fa-clock mr-2"></i>Salida: 6:00 AM</span>
+            <span class="bg-red-900/30 px-4 py-2 rounded-full"><i class="fas fa-flag-checkered mr-2"></i>Retorno: 8:30 PM</span>
+            <span class="bg-red-900/30 px-4 py-2 rounded-full"><i class="fas fa-calendar-week mr-2"></i>Duración: Todo el día</span>
+          </div>
+          <p class="text-gray-300 leading-relaxed mb-4">Caminaremos sobre cascadas y lagunas al cruzar nuestro <strong class="text-red-400">puente colgante de 70m</strong>, adrenalina y vistas excepcionales. Después abordaremos la ruta del pescador con fotografías en las cataratas Carhuayno, el valle de Quiriano y el Apu tutelar. Descenderemos por 345 gradas de piedra hasta la laguna de Huallhua, paseo en bote y visitaremos jaulas flotantes.</p>
+          <p class="text-gray-300 leading-relaxed">En este trekking recorreremos paisajes increíbles: laguna oculta, necrópolis de Quimllo, posada del Martín Pescador y la laguna del Salto. Aprenderás sobre plantas medicinales, mitos y leyendas como los pishtacos y las sirenas.</p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <span class="bg-zinc-800 px-3 py-1 rounded-full text-xs">Selva Tours</span>
+            <span class="bg-zinc-800 px-3 py-1 rounded-full text-xs">Huancaya Tours</span>
+            <span class="bg-zinc-800 px-3 py-1 rounded-full text-xs">Tarma Tours</span>
+            <span class="bg-zinc-800 px-3 py-1 rounded-full text-xs">Oxapampa Tours</span>
+          </div>
+        </div>
+        <div class="order-1 md:order-2">
+          <img src="assets/img/img_13.jpg" alt="Nor Yauyos" class="rounded-2xl shadow-2xl border border-red-800/30 w-full object-cover h-96">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LO MÁS BUSCADO (carrusel de lugares) -->
+  <section class="py-20 bg-black">
+    <div class="container mx-auto px-6 text-center">
+      <p class="text-red-500 font-bold uppercase text-sm tracking-wider"><i class="fas fa-star mr-2"></i>Imperdibles</p>
+      <h2 class="text-4xl font-black mt-2 mb-4">Aventuras que debes vivir</h2>
+      <p class="text-gray-400 max-w-xl mx-auto mb-12">Los destinos favoritos por nuestros viajeros, llenos de cultura, naturaleza y adrenalina.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
+        <!-- Card 1 -->
+        <div class="bg-zinc-900 rounded-2xl overflow-hidden border border-red-900/30 card-hover">
+          <img src="assets/img/img_3.jpg" alt="Oxapampa" class="h-52 w-full object-cover">
+          <div class="p-5 text-left">
+            <h3 class="text-xl font-bold text-white">Oxapampa</h3>
+            <p class="text-gray-400 text-sm flex items-center gap-1 mt-1"><i class="fas fa-map-marker-alt text-red-500 text-xs"></i> Pasco</p>
+          </div>
+        </div>
+        <div class="bg-zinc-900 rounded-2xl overflow-hidden border border-red-900/30 card-hover">
+          <img src="assets/img/img_1.jpg" alt="Huaytapallana" class="h-52 w-full object-cover">
+          <div class="p-5 text-left">
+            <h3 class="text-xl font-bold text-white">Nevado Huaytapallana</h3>
+            <p class="text-gray-400 text-sm flex items-center gap-1 mt-1"><i class="fas fa-map-marker-alt text-red-500 text-xs"></i> Junín</p>
+          </div>
+        </div>
+        <div class="bg-zinc-900 rounded-2xl overflow-hidden border border-red-900/30 card-hover">
+          <img src="assets/img/img_4.jpg" alt="Cusco" class="h-52 w-full object-cover">
+          <div class="p-5 text-left">
+            <h3 class="text-xl font-bold text-white">Cusco</h3>
+            <p class="text-gray-400 text-sm flex items-center gap-1 mt-1"><i class="fas fa-map-marker-alt text-red-500 text-xs"></i> Cusco</p>
+          </div>
+        </div>
+        <div class="bg-zinc-900 rounded-2xl overflow-hidden border border-red-900/30 card-hover">
+          <img src="assets/img/img_5.jpg" alt="Selva Central" class="h-52 w-full object-cover">
+          <div class="p-5 text-left">
+            <h3 class="text-xl font-bold text-white">Selva Central</h3>
+            <p class="text-gray-400 text-sm flex items-center gap-1 mt-1"><i class="fas fa-map-marker-alt text-red-500 text-xs"></i> Junín</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LLAMADA A LA ACCIÓN ASIMÉTRICA -->
+  <section class="py-16 bg-gradient-to-r from-red-950 to-black">
+    <div class="container mx-auto px-6 grid md:grid-cols-2 gap-8 items-center">
+      <div>
+        <p class="text-red-300 font-semibold text-sm uppercase"><i class="fas fa-suitcase-rolling mr-2"></i>Listo para viajar</p>
+        <h2 class="text-3xl md:text-4xl font-black mt-2">¿Y tu equipaje?</h2>
+        <p class="text-gray-300 mt-3 mb-5">No dejes nada al azar. Te ayudamos a preparar todo para tu próxima ruta por la sierra o la selva central.</p>
+        <a href="https://wa.me/51990693358?text=Hola%20quiero%20información%20sobre%20los%20paquetes%20para%20turismo"
+          target="_blank" class="inline-flex items-center gap-2 bg-red-700 hover:bg-red-800 px-6 py-3 rounded-full font-bold transition"> <i class="fab fa-whatsapp"></i> Consultar ahora</a>
+      </div>
+      <div class="relative">
+        <img src="assets/img/viaje.jpg" alt="Equipaje" class="rounded-2xl shadow-2xl border border-red-700">
+      </div>
+    </div>
+  </section>
+
+  <!-- INFORMACIÓN DE CONTACTO (teléfonos, dirección, correos) -->
+  <section class="py-16 bg-zinc-950">
+    <div class="container mx-auto px-6 text-center">
+      <p class="text-red-500 text-sm font-bold uppercase"><i class="fas fa-map-pin mr-2"></i>Contáctanos</p>
+      <h2 class="text-4xl font-black mt-2 mb-10">Estamos en Huancayo</h2>
+      <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <div class="bg-zinc-900 p-6 rounded-2xl border border-red-800/40">
+          <div class="w-14 h-14 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-phone-alt text-red-500 text-xl"></i>
+          </div>
+          <h3 class="text-lg font-bold">Teléfonos</h3>
+          <p class="text-gray-300">990 693 358 / 966 862 395</p>
+        </div>
+        <div class="bg-zinc-900 p-6 rounded-2xl border border-red-800/40">
+          <div class="w-14 h-14 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-envelope text-red-500 text-xl"></i>
+          </div>
+          <h3 class="text-lg font-bold">Correos</h3>
+          <p class="text-gray-300 text-sm">reservas@illariytravel.com<br>illariyperutravel@gmail.com</p>
+        </div>
+        <div class="bg-zinc-900 p-6 rounded-2xl border border-red-800/40">
+          <div class="w-14 h-14 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-location-dot text-red-500 text-xl"></i>
+          </div>
+          <h3 class="text-lg font-bold">Dirección</h3>
+          <p class="text-gray-300">Jr.Puno 293 (frente al hotel Los Balcones), Huancayo</p>
+        </div>
+      </div>
+      <div class="mt-8">
+        <a href="https://tours-express.vercel.app/" target="_blank" class="text-gray-400 hover:text-red-400 text-sm uppercase tracking-wider">Intranet →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-black border-t border-red-900/30 py-8">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="text-2xl font-extrabold">
+        <span class="text-red-600">ILLARIY</span> <span class="text-white font-light">Travel</span>
+      </div>
+      <div class="flex gap-6 text-sm text-gray-400">
+        <a href="#" class="hover:text-red-400">Política de privacidad</a>
+        <a href="#" class="hover:text-red-400">Términos y condiciones</a>
+      </div>
+      <p class="text-sm text-gray-500">© 2018 Illariy Peru Travel Group Huancayo</p>
+    </div>
+  </footer>
+</body>
+<script src="assets/js/chatbot.js"></script>
+</html>
