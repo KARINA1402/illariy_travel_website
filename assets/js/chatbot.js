@@ -4,7 +4,7 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const WHATSAPP_NUMBER = '51990693358';
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=Hola%2C%20necesito%20ayuda%20con%20un%20tour%20y%20pago`;
 const UBICACION_NOMBRE = 'Jr. Puno 293, Huancayo';
-const API_PAQUETES = 'https://localhost:7047/api/Paquete';
+const API_PAQUETES = 'https://illary.somee.com/api/Paquete';
 const EMPRESA_RUC = '20603181621';
 const EMPRESA_NOMBRE = 'ILLARIY PERU TRAVEL GROUP E.I.R.L.';
 

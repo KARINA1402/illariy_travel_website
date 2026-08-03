@@ -313,12 +313,12 @@
         pasaporte: document.getElementById("pasaporte").value,
       };
 
-      fetch(`https://localhost:7047/api/Cliente/email?correo=${encodeURIComponent(cliente.correo)}`)
+      fetch(`https://illary.somee.com/api/Cliente/email?correo=${encodeURIComponent(cliente.correo)}`)
         .then(checkRes => {
           if (checkRes.ok) {
             throw new Error("Ya eres un cliente registrado.");
           } else if (checkRes.status === 404) {
-            return fetch("https://localhost:7047/api/Cliente", {
+            return fetch("https://illary.somee.com/api/Cliente", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(cliente)
