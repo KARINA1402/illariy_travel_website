@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Checkout – Illariy Travel</title>
   <link rel="icon" href="assets/img/logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -19,14 +22,22 @@
       --text: #F5F5F5;
       --text-muted: #A1A1AA;
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg-dark);
       color: var(--text);
       margin: 0;
     }
-    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
     .field {
       background: var(--bg-input);
       border: 1px solid var(--border);
@@ -36,8 +47,16 @@
       color: white;
       transition: border 0.2s;
     }
-    .field:focus { border-color: var(--accent); outline: none; }
-    .field.error { border-color: #EF4444; }
+
+    .field:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .field.error {
+      border-color: #EF4444;
+    }
+
     .btn-pagar {
       background: linear-gradient(135deg, var(--accent), var(--accent-dark));
       border-radius: 40px;
@@ -48,7 +67,11 @@
       border: none;
       cursor: pointer;
     }
-    .btn-pagar:hover { opacity: 0.9; }
+
+    .btn-pagar:hover {
+      opacity: 0.9;
+    }
+
     .pasajero-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -56,6 +79,7 @@
       padding: 1.5rem;
       margin-bottom: 1.2rem;
     }
+
     .modal-box {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -64,18 +88,22 @@
       width: 90%;
       padding: 2rem;
     }
+
     #modal-pago {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(8px);
       z-index: 9999;
       align-items: center;
       justify-content: center;
     }
-    #modal-pago.open { display: flex; }
-    
+
+    #modal-pago.open {
+      display: flex;
+    }
+
     /* ── BOLETA MEJORADA (estilo comprobante) ── */
     .boleta-wrapper {
       display: none;
@@ -85,42 +113,51 @@
       font-family: 'Inter', sans-serif;
       color: #111;
     }
+
     .boleta-container {
       max-width: 700px;
       margin: 0 auto;
       background: white;
       border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
       padding: 2rem 2rem 1.5rem;
       border: 1px solid #e5e7eb;
     }
+
     .encabezado {
       text-align: center;
       border-bottom: 2px dashed #d1d5db;
       padding-bottom: 1rem;
       margin-bottom: 1.2rem;
     }
+
     .logo-boleta {
       width: 70px;
       height: auto;
       margin-bottom: 0.5rem;
     }
+
     .nombre-empresa {
       font-size: 20px;
       font-weight: 800;
       color: #B91C1C;
       letter-spacing: 1px;
     }
+
     .subtitulo {
       font-size: 13px;
       color: #4b5563;
       font-weight: 500;
     }
-    .direccion, .contacto, .ruc {
+
+    .direccion,
+    .contacto,
+    .ruc {
       font-size: 12px;
       color: #6b7280;
       margin-top: 2px;
     }
+
     .boleta-tag {
       margin-top: 8px;
       font-size: 13px;
@@ -130,13 +167,16 @@
       justify-content: center;
       gap: 2rem;
     }
+
     .nro-operacion {
       color: #B91C1C;
       font-weight: 800;
     }
+
     .seccion {
       margin: 1.2rem 0;
     }
+
     .seccion-titulo {
       font-size: 13px;
       font-weight: 700;
@@ -147,6 +187,7 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
+
     .info-reserva .linea,
     .paquete-linea {
       display: flex;
@@ -155,14 +196,19 @@
       padding: 4px 0;
       border-bottom: 1px dotted #e5e7eb;
     }
-    .linea .etiqueta, .paquete-linea .etiqueta {
+
+    .linea .etiqueta,
+    .paquete-linea .etiqueta {
       color: #4b5563;
       font-weight: 500;
     }
-    .linea .valor, .paquete-linea .valor {
+
+    .linea .valor,
+    .paquete-linea .valor {
       font-weight: 600;
       color: #1f2937;
     }
+
     .badge-personas {
       background: #B91C1C;
       color: white;
@@ -171,6 +217,7 @@
       font-size: 12px;
       font-weight: 700;
     }
+
     .pasajero-card-boleta {
       background: #f9fafb;
       border-radius: 8px;
@@ -178,6 +225,7 @@
       margin-bottom: 6px;
       border: 1px solid #e5e7eb;
     }
+
     .pasajero-header {
       display: flex;
       justify-content: space-between;
@@ -186,7 +234,9 @@
       font-weight: 600;
       color: #1f2937;
     }
-    .badge-titular, .badge-acomp {
+
+    .badge-titular,
+    .badge-acomp {
       font-size: 10px;
       font-weight: 700;
       padding: 2px 8px;
@@ -195,32 +245,38 @@
       color: white;
       text-transform: uppercase;
     }
+
     .badge-acomp {
       background: #6b7280;
     }
+
     .pasajero-doc {
       font-size: 11px;
       color: #4b5563;
       margin-top: 4px;
     }
+
     .paquete-card {
       background: #f9fafb;
       border-radius: 8px;
       padding: 10px 12px;
       margin-bottom: 0.8rem;
     }
+
     .paquete-nombre {
       font-weight: 700;
       font-size: 14px;
       color: #B91C1C;
       margin-bottom: 6px;
     }
+
     .resumen-venta {
       background: #f9fafb;
       border-radius: 8px;
       padding: 1rem;
       margin: 1.2rem 0;
     }
+
     .resumen-titulo {
       font-weight: 700;
       font-size: 14px;
@@ -229,12 +285,14 @@
       border-bottom: 1px solid #e5e7eb;
       padding-bottom: 4px;
     }
+
     .resumen-linea {
       display: flex;
       justify-content: space-between;
       font-size: 13px;
       padding: 4px 0;
     }
+
     .total-importe {
       font-size: 16px;
       font-weight: 800;
@@ -243,8 +301,16 @@
       margin-top: 6px;
       padding-top: 6px;
     }
-    .monto-pagado { font-weight: 700; color: #059669; }
-    .vuelto { color: #6b7280; }
+
+    .monto-pagado {
+      font-weight: 700;
+      color: #059669;
+    }
+
+    .vuelto {
+      color: #6b7280;
+    }
+
     .pie-boleta {
       margin-top: 1.5rem;
       border-top: 2px dashed #d1d5db;
@@ -254,49 +320,94 @@
       color: #4b5563;
       line-height: 1.6;
     }
+
     .fecha-emision {
       font-weight: 600;
       margin-top: 4px;
       color: #1f2937;
     }
-    .notas { font-size: 12px; color: #374151; }
-    .nota { margin-bottom: 6px; }
-    .nota-incluye strong { color: #059669; }
-    .nota-excluye strong { color: #DC2626; }
+
+    .notas {
+      font-size: 12px;
+      color: #374151;
+    }
+
+    .nota {
+      margin-bottom: 6px;
+    }
+
+    .nota-incluye strong {
+      color: #059669;
+    }
+
+    .nota-excluye strong {
+      color: #DC2626;
+    }
 
     @media print {
-      body > *:not(#boleta-wrapper) { display: none; }
+      body>*:not(#boleta-wrapper) {
+        display: none;
+      }
+
       #boleta-wrapper {
         display: block !important;
         background: white !important;
         padding: 0 !important;
       }
+
       .boleta-container {
         box-shadow: none;
         border: none;
         max-width: 100%;
         padding: 1rem;
       }
-      .no-print { display: none; }
-      @page { size: 80mm auto; margin: 4mm; }
+
+      .no-print {
+        display: none;
+      }
+
+      @page {
+        size: 80mm auto;
+        margin: 4mm;
+      }
     }
+
     .spinner {
-      width: 20px; height: 20px;
-      border: 2px solid rgba(255,255,255,0.2);
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
       border-top-color: white;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       display: inline-block;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     /* Mensajes RENIEC y autocompletado */
-    .info-msg { font-size: 12px; margin-top: 4px; }
-    .info-msg.ok    { color: #10B981; }
-    .info-msg.warn  { color: #F59E0B; }
-    .info-msg.err   { color: #EF4444; }
+    .info-msg {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .info-msg.ok {
+      color: #10B981;
+    }
+
+    .info-msg.warn {
+      color: #F59E0B;
+    }
+
+    .info-msg.err {
+      color: #EF4444;
+    }
+
     .verificape-badge {
-      background: rgba(16,185,129,0.1);
+      background: rgba(16, 185, 129, 0.1);
       color: #10B981;
       font-size: 10px;
       font-weight: 600;
@@ -307,8 +418,9 @@
       align-items: center;
       gap: 4px;
     }
+
     .autocomplete-badge {
-      background: rgba(220,38,38,0.12);
+      background: rgba(220, 38, 38, 0.12);
       color: #FCA5A5;
       font-size: 10px;
       font-weight: 700;
@@ -320,6 +432,7 @@
       gap: 4px;
       margin-top: 4px;
     }
+
     .edad-error-msg {
       font-size: 12px;
       color: #EF4444;
@@ -328,161 +441,205 @@
     }
   </style>
 </head>
+
 <body>
 
-<nav class="bg-black/80 backdrop-blur-md border-b border-red-900/40 sticky top-0 z-50">
-  <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-    <a href="index.html" class="flex items-center gap-2">
-      <img src="assets/img/logo.png" alt="Illariy Travel" class="h-8 w-auto">
-      <span class="text-2xl font-extrabold"><span class="text-red-600">ILLARIY</span> <span class="text-white font-light">Travel</span></span>
-    </a>
-    <div class="flex items-center gap-5 text-sm font-semibold">
-      <a href="index.html" class="text-gray-300 hover:text-red-400">Inicio</a>
-      <a href="destinos.html" class="text-gray-300 hover:text-red-400">Aventuras</a>
-      <a href="galeria.html" class="text-gray-300 hover:text-red-400">Galería</a>
-      <a href="registro.html" class="bg-red-700 px-5 py-2 rounded-full">Registrarse</a>
+  <nav class="bg-black/80 backdrop-blur-md border-b border-red-900/40 sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/img/logo.png" alt="Illariy Travel" class="h-8 w-auto">
+        <span class="text-2xl font-extrabold"><span class="text-red-600">ILLARIY</span> <span
+            class="text-white font-light">Travel</span></span>
+      </a>
+      <div class="flex items-center gap-5 text-sm font-semibold">
+        <a href="index.html" class="text-gray-300 hover:text-red-400">Inicio</a>
+        <a href="destinos.html" class="text-gray-300 hover:text-red-400">Aventuras</a>
+        <a href="galeria.html" class="text-gray-300 hover:text-red-400">Galería</a>
+        <a href="registro.html" class="bg-red-700 px-5 py-2 rounded-full">Registrarse</a>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<div id="checkout-wrapper" class="container mx-auto px-6 py-10" style="max-width: 1100px;">
-  <div id="pkg-loading" class="text-center py-20"><div class="spinner w-12 h-12 border-4 mx-auto"></div><p class="mt-4">Cargando paquete...</p></div>
-  <div id="pkg-error" class="hidden text-center py-20"><i class="fas fa-exclamation-triangle text-5xl text-red-500"></i><p class="mt-4">Error al cargar el paquete</p><a href="destinos.html" class="bg-red-700 px-6 py-2 rounded-full inline-block mt-4">Volver</a></div>
+  <div id="checkout-wrapper" class="container mx-auto px-6 py-10" style="max-width: 1100px;">
+    <div id="pkg-loading" class="text-center py-20">
+      <div class="spinner w-12 h-12 border-4 mx-auto"></div>
+      <p class="mt-4">Cargando paquete...</p>
+    </div>
+    <div id="pkg-error" class="hidden text-center py-20"><i
+        class="fas fa-exclamation-triangle text-5xl text-red-500"></i>
+      <p class="mt-4">Error al cargar el paquete</p><a href="destinos.html"
+        class="bg-red-700 px-6 py-2 rounded-full inline-block mt-4">Volver</a>
+    </div>
 
-  <div id="checkout-main" class="hidden grid gap-8 lg:grid-cols-2">
-    <!-- COLUMNA IZQUIERDA -->
-    <div>
-      <div class="bg-zinc-900 rounded-2xl border border-red-800/30 p-5 flex gap-5 mb-8">
-        <img id="pkg-img" class="w-36 h-36 object-cover rounded-xl">
-        <div class="flex-1">
-          <span id="pkg-tipo" class="bg-red-700 text-xs px-3 py-1 rounded-full inline-block"></span>
-          <h1 id="pkg-nombre" class="text-2xl font-black mt-2"></h1>
-          <p id="pkg-desc" class="text-gray-400 text-sm mt-1"></p>
-          <div id="pkg-duracion" class="text-sm text-gray-400 mt-2"><i class="far fa-clock text-red-500"></i> </div>
+    <div id="checkout-main" class="hidden grid gap-8 lg:grid-cols-2">
+      <!-- COLUMNA IZQUIERDA -->
+      <div>
+        <div class="bg-zinc-900 rounded-2xl border border-red-800/30 p-5 flex gap-5 mb-8">
+          <img id="pkg-img" class="w-36 h-36 object-cover rounded-xl">
+          <div class="flex-1">
+            <span id="pkg-tipo" class="bg-red-700 text-xs px-3 py-1 rounded-full inline-block"></span>
+            <h1 id="pkg-nombre" class="text-2xl font-black mt-2"></h1>
+            <p id="pkg-desc" class="text-gray-400 text-sm mt-1"></p>
+            <div id="pkg-duracion" class="text-sm text-gray-400 mt-2"><i class="far fa-clock text-red-500"></i> </div>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-gray-400">Por persona</p>
+            <p id="pkg-precio" class="text-2xl font-black text-red-500"></p>
+          </div>
         </div>
-        <div class="text-right"><p class="text-xs text-gray-400">Por persona</p><p id="pkg-precio" class="text-2xl font-black text-red-500"></p></div>
+
+        <div class="pasajero-card">
+          <p class="font-black mb-3"><i class="fas fa-users text-red-500"></i> Viajeros</p>
+          <div class="flex items-center gap-4">
+            <button class="bg-zinc-800 w-8 h-8 rounded-full hover:bg-zinc-700" onclick="changePasajeros(-1)">-</button>
+            <span id="num-display" class="text-2xl font-black w-10 text-center">1</span>
+            <button class="bg-zinc-800 w-8 h-8 rounded-full hover:bg-zinc-700" onclick="changePasajeros(1)">+</button>
+            <span class="text-sm text-gray-400">persona(s)</span>
+          </div>
+        </div>
+
+        <div id="pasajeros-container"></div>
       </div>
 
-      <div class="pasajero-card">
-        <p class="font-black mb-3"><i class="fas fa-users text-red-500"></i> Viajeros</p>
-        <div class="flex items-center gap-4">
-          <button class="bg-zinc-800 w-8 h-8 rounded-full hover:bg-zinc-700" onclick="changePasajeros(-1)">-</button>
-          <span id="num-display" class="text-2xl font-black w-10 text-center">1</span>
-          <button class="bg-zinc-800 w-8 h-8 rounded-full hover:bg-zinc-700" onclick="changePasajeros(1)">+</button>
-          <span class="text-sm text-gray-400">persona(s)</span>
+      <!-- COLUMNA DERECHA: RESUMEN -->
+      <div>
+        <div class="bg-zinc-900 rounded-2xl p-6 sticky top-24">
+          <p class="font-black text-lg mb-4"><i class="fas fa-receipt text-red-500"></i> Resumen de compra</p>
+          <div id="summary-pkg-nombre" class="font-bold text-gray-200 mb-3"></div>
+          <div class="flex justify-between py-2 border-b border-zinc-800"><span>Precio unitario</span><span
+              id="sum-unit" class="mono"></span></div>
+          <div class="flex justify-between py-2 border-b border-zinc-800"><span>Pasajeros</span><span id="sum-qty"
+              class="mono"></span></div>
+          <div class="flex justify-between py-2 border-b border-zinc-800"><span>Subtotal (sin IGV)</span><span
+              id="sum-subtotal" class="mono"></span></div>
+          <div class="flex justify-between py-2 border-b border-zinc-800"><span>IGV (18%)</span><span id="sum-igv"
+              class="mono"></span></div>
+          <div class="flex justify-between text-red-500 text-xl font-black pt-3 mt-2 border-t-2 border-red-500">
+            <span>TOTAL</span><span id="sum-total" class="mono"></span></div>
+          <button class="btn-pagar mt-6 flex items-center justify-center gap-2" onclick="abrirModalPago()"><i
+              class="fas fa-lock"></i> Pagar ahora</button>
+          <p class="text-center text-xs text-gray-500 mt-4"><i class="fas fa-shield-alt text-red-500"></i> Pago 100%
+            seguro</p>
         </div>
       </div>
-
-      <div id="pasajeros-container"></div>
     </div>
+  </div>
 
-    <!-- COLUMNA DERECHA: RESUMEN -->
-    <div>
-      <div class="bg-zinc-900 rounded-2xl p-6 sticky top-24">
-        <p class="font-black text-lg mb-4"><i class="fas fa-receipt text-red-500"></i> Resumen de compra</p>
-        <div id="summary-pkg-nombre" class="font-bold text-gray-200 mb-3"></div>
-        <div class="flex justify-between py-2 border-b border-zinc-800"><span>Precio unitario</span><span id="sum-unit" class="mono"></span></div>
-        <div class="flex justify-between py-2 border-b border-zinc-800"><span>Pasajeros</span><span id="sum-qty" class="mono"></span></div>
-        <div class="flex justify-between py-2 border-b border-zinc-800"><span>Subtotal (sin IGV)</span><span id="sum-subtotal" class="mono"></span></div>
-        <div class="flex justify-between py-2 border-b border-zinc-800"><span>IGV (18%)</span><span id="sum-igv" class="mono"></span></div>
-        <div class="flex justify-between text-red-500 text-xl font-black pt-3 mt-2 border-t-2 border-red-500"><span>TOTAL</span><span id="sum-total" class="mono"></span></div>
-        <button class="btn-pagar mt-6 flex items-center justify-center gap-2" onclick="abrirModalPago()"><i class="fas fa-lock"></i> Pagar ahora</button>
-        <p class="text-center text-xs text-gray-500 mt-4"><i class="fas fa-shield-alt text-red-500"></i> Pago 100% seguro</p>
+  <!-- MODAL DE PAGO -->
+  <div id="modal-pago">
+    <div class="modal-box">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-black">Pago con tarjeta</h3><button onclick="cerrarModalPago()"
+          class="text-gray-400 hover:text-red-500 text-2xl">&times;</button>
       </div>
+      <div class="flex gap-3 mb-4"><i class="fab fa-cc-visa text-3xl"></i><i
+          class="fab fa-cc-mastercard text-3xl"></i><i class="fab fa-cc-amex text-3xl"></i></div>
+      <div class="mb-3"><label class="text-xs uppercase block mb-1">Número de tarjeta</label><input id="card-num"
+          class="field" placeholder="**** **** **** ****" oninput="formatCardNum(this)">
+        <p id="err-card-num" class="text-red-400 text-xs hidden mt-1"></p>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div><label>Fecha expiración</label><input id="card-exp" class="field" placeholder="MM/AA"
+            oninput="formatExpiry(this)">
+          <p id="err-card-exp" class="text-red-400 text-xs hidden"></p>
+        </div>
+        <div><label>CVV</label><input id="card-cvv" class="field" type="password" placeholder="123">
+          <p id="err-card-cvv" class="text-red-400 text-xs hidden"></p>
+        </div>
+      </div>
+      <div class="mb-3"><label>Nombre en tarjeta</label><input id="card-name" class="field"
+          placeholder="Como aparece en la tarjeta">
+        <p id="err-card-name" class="text-red-400 text-xs hidden"></p>
+      </div>
+      <div class="mb-4"><label>Documento (DNI/CE)</label><input id="card-doc" class="field"
+          placeholder="Número de documento">
+        <p id="err-card-doc" class="text-red-400 text-xs hidden"></p>
+      </div>
+      <div class="flex justify-between p-3 bg-zinc-800 rounded-xl mb-4"><span>Total a pagar</span><span id="modal-total"
+          class="text-red-500 font-black text-xl"></span></div>
+      <p id="modal-error" class="text-red-500 text-center hidden mb-2"></p>
+      <button id="btn-confirmar" class="btn-pagar flex items-center justify-center gap-2" onclick="procesarPago()"><span
+          id="btn-confirmar-txt">Confirmar pago</span>
+        <div id="btn-confirmar-spinner" class="spinner hidden"></div>
+      </button>
     </div>
   </div>
-</div>
 
-<!-- MODAL DE PAGO -->
-<div id="modal-pago">
-  <div class="modal-box">
-    <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-black">Pago con tarjeta</h3><button onclick="cerrarModalPago()" class="text-gray-400 hover:text-red-500 text-2xl">&times;</button></div>
-    <div class="flex gap-3 mb-4"><i class="fab fa-cc-visa text-3xl"></i><i class="fab fa-cc-mastercard text-3xl"></i><i class="fab fa-cc-amex text-3xl"></i></div>
-    <div class="mb-3"><label class="text-xs uppercase block mb-1">Número de tarjeta</label><input id="card-num" class="field" placeholder="**** **** **** ****" oninput="formatCardNum(this)"><p id="err-card-num" class="text-red-400 text-xs hidden mt-1"></p></div>
-    <div class="grid grid-cols-2 gap-3 mb-3"><div><label>Fecha expiración</label><input id="card-exp" class="field" placeholder="MM/AA" oninput="formatExpiry(this)"><p id="err-card-exp" class="text-red-400 text-xs hidden"></p></div><div><label>CVV</label><input id="card-cvv" class="field" type="password" placeholder="123"><p id="err-card-cvv" class="text-red-400 text-xs hidden"></p></div></div>
-    <div class="mb-3"><label>Nombre en tarjeta</label><input id="card-name" class="field" placeholder="Como aparece en la tarjeta"><p id="err-card-name" class="text-red-400 text-xs hidden"></p></div>
-    <div class="mb-4"><label>Documento (DNI/CE)</label><input id="card-doc" class="field" placeholder="Número de documento"><p id="err-card-doc" class="text-red-400 text-xs hidden"></p></div>
-    <div class="flex justify-between p-3 bg-zinc-800 rounded-xl mb-4"><span>Total a pagar</span><span id="modal-total" class="text-red-500 font-black text-xl"></span></div>
-    <p id="modal-error" class="text-red-500 text-center hidden mb-2"></p>
-    <button id="btn-confirmar" class="btn-pagar flex items-center justify-center gap-2" onclick="procesarPago()"><span id="btn-confirmar-txt">Confirmar pago</span><div id="btn-confirmar-spinner" class="spinner hidden"></div></button>
+  <!-- BOLETA MEJORADA (comprobante profesional) -->
+  <div id="boleta-wrapper" class="boleta-wrapper">
+    <div class="no-print text-center mb-6">
+      <button onclick="window.print()" class="bg-red-700 px-6 py-2 rounded-full text-white"><i
+          class="fas fa-print mr-2"></i> Imprimir boleta</button>
+      <a href="destinos.html" class="ml-4 bg-zinc-800 px-6 py-2 rounded-full text-white">Ver más destinos</a>
+    </div>
+    <div id="boleta-content" class="boleta-container"></div>
   </div>
-</div>
 
-<!-- BOLETA MEJORADA (comprobante profesional) -->
-<div id="boleta-wrapper" class="boleta-wrapper">
-  <div class="no-print text-center mb-6">
-    <button onclick="window.print()" class="bg-red-700 px-6 py-2 rounded-full text-white"><i class="fas fa-print mr-2"></i> Imprimir boleta</button>
-    <a href="destinos.html" class="ml-4 bg-zinc-800 px-6 py-2 rounded-full text-white">Ver más destinos</a>
-  </div>
-  <div id="boleta-content" class="boleta-container"></div>
-</div>
+  <script>
+    const API = 'https://illary.somee.com/api';
+    const VERIFICAPE_API = API + '/VerificaPe/v2/dni';
 
-<script>
-const API = 'https://illary.somee.com/api';
-const VERIFICAPE_TOKEN = 'vp_live_aada01fa0e4c4fa290b3e042fc612bb8';
-const VERIFICAPE_API   = 'https://corsproxy.io/?https://api.verificape.com/v2/dni';
+    let paquete = null;
+    let numeroPax = 1;
+    let clienteCache = {};
+    let dniCache = {};
+    let dniClienteCache = {};
 
-let paquete = null;
-let numeroPax = 1;
-let clienteCache = {};
-let dniCache = {};
-let dniClienteCache = {};
+    document.addEventListener('DOMContentLoaded', () => {
+      const id = new URLSearchParams(location.search).get('iD_Paquete');
+      if (!id) mostrarPkgError();
+      else cargarPaquete(id);
+    });
 
-document.addEventListener('DOMContentLoaded', () => {
-  const id = new URLSearchParams(location.search).get('iD_Paquete');
-  if(!id) mostrarPkgError();
-  else cargarPaquete(id);
-});
+    async function cargarPaquete(id) {
+      try {
+        const res = await fetch(`${API}/Paquete/${id}`);
+        if (!res.ok) throw new Error();
+        paquete = await res.json();
+        renderPaquete();
+        renderPasajeros();
+        actualizarResumen();
+        document.getElementById('pkg-loading').classList.add('hidden');
+        document.getElementById('checkout-main').classList.remove('hidden');
+      } catch (e) { mostrarPkgError(); }
+    }
+    function mostrarPkgError() {
+      document.getElementById('pkg-loading').classList.add('hidden');
+      document.getElementById('pkg-error').classList.remove('hidden');
+    }
+    function renderPaquete() {
+      document.getElementById('pkg-img').src = paquete.imagen || 'assets/img/bus.jpg';
+      document.getElementById('pkg-nombre').innerText = paquete.nombre;
+      document.getElementById('pkg-desc').innerText = paquete.descripcion || '';
+      document.getElementById('pkg-tipo').innerText = paquete.tipo || 'Tour';
+      document.getElementById('pkg-duracion').innerHTML = `<i class="far fa-clock text-red-500"></i> ${paquete.duracion || 'Flexible'}`;
+      document.getElementById('pkg-precio').innerText = `S/ ${(paquete.precio_Base || 0).toFixed(2)}`;
+      document.getElementById('summary-pkg-nombre').innerText = paquete.nombre;
+    }
+    function changePasajeros(delta) {
+      let nuevo = Math.max(1, Math.min(20, numeroPax + delta));
+      if (nuevo === numeroPax) return;
+      numeroPax = nuevo;
+      document.getElementById('num-display').innerText = numeroPax;
+      renderPasajeros();
+      actualizarResumen();
+    }
+    function renderPasajeros() {
+      const container = document.getElementById('pasajeros-container');
+      let current = container.children.length;
+      if (current < numeroPax) for (let i = current; i < numeroPax; i++) container.appendChild(crearFormPasajero(i));
+      if (current > numeroPax) while (container.children.length > numeroPax) container.removeChild(container.lastChild);
+    }
 
-async function cargarPaquete(id) {
-  try {
-    const res = await fetch(`${API}/Paquete/${id}`);
-    if(!res.ok) throw new Error();
-    paquete = await res.json();
-    renderPaquete();
-    renderPasajeros();
-    actualizarResumen();
-    document.getElementById('pkg-loading').classList.add('hidden');
-    document.getElementById('checkout-main').classList.remove('hidden');
-  } catch(e) { mostrarPkgError(); }
-}
-function mostrarPkgError() {
-  document.getElementById('pkg-loading').classList.add('hidden');
-  document.getElementById('pkg-error').classList.remove('hidden');
-}
-function renderPaquete() {
-  document.getElementById('pkg-img').src = paquete.imagen || 'assets/img/bus.jpg';
-  document.getElementById('pkg-nombre').innerText = paquete.nombre;
-  document.getElementById('pkg-desc').innerText = paquete.descripcion || '';
-  document.getElementById('pkg-tipo').innerText = paquete.tipo || 'Tour';
-  document.getElementById('pkg-duracion').innerHTML = `<i class="far fa-clock text-red-500"></i> ${paquete.duracion || 'Flexible'}`;
-  document.getElementById('pkg-precio').innerText = `S/ ${(paquete.precio_Base || 0).toFixed(2)}`;
-  document.getElementById('summary-pkg-nombre').innerText = paquete.nombre;
-}
-function changePasajeros(delta) {
-  let nuevo = Math.max(1, Math.min(20, numeroPax + delta));
-  if(nuevo === numeroPax) return;
-  numeroPax = nuevo;
-  document.getElementById('num-display').innerText = numeroPax;
-  renderPasajeros();
-  actualizarResumen();
-}
-function renderPasajeros() {
-  const container = document.getElementById('pasajeros-container');
-  let current = container.children.length;
-  if(current < numeroPax) for(let i=current; i<numeroPax; i++) container.appendChild(crearFormPasajero(i));
-  if(current > numeroPax) while(container.children.length > numeroPax) container.removeChild(container.lastChild);
-}
+    /* ═══════════════════════════ FORMULARIO PASAJERO ═══════════════════════════ */
+    function crearFormPasajero(idx) {
+      const div = document.createElement('div');
+      div.className = 'pasajero-card';
+      const isTitular = idx === 0;
 
-/* ═══════════════════════════ FORMULARIO PASAJERO ═══════════════════════════ */
-function crearFormPasajero(idx) {
-  const div = document.createElement('div');
-  div.className = 'pasajero-card';
-  const isTitular = idx === 0;
-
-  div.innerHTML = `
+      div.innerHTML = `
     <div class="flex justify-between items-center mb-4">
-      <p class="font-black"><i class="fas fa-user text-red-500"></i> ${isTitular ? 'Titular (Pasajero 1)' : `Pasajero ${idx+1}`}</p>
+      <p class="font-black"><i class="fas fa-user text-red-500"></i> ${isTitular ? 'Titular (Pasajero 1)' : `Pasajero ${idx + 1}`}</p>
       ${isTitular ? '<span class="bg-red-800 text-xs px-2 py-1 rounded-full">Titular</span>' : ''}
     </div>
 
@@ -544,485 +701,484 @@ function crearFormPasajero(idx) {
     </div>
     ` : ''}
   `;
-  return div;
-}
+      return div;
+    }
 
-/* ═══════════════════════════ VALIDACIÓN EDAD ═══════════════════════════════ */
-function calcularEdad(fechaISO) {
-  const nacimiento = new Date(fechaISO);
-  const hoy = new Date();
-  let edad = hoy.getFullYear() - nacimiento.getFullYear();
-  const m = hoy.getMonth() - nacimiento.getMonth();
-  if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
-  return edad;
-}
-function validarEdadPasajero(idx, input) {
-  const isTitular = idx === 0;
-  const msgEl = document.getElementById(`pax-${idx}-edad-msg`);
-  if (!input.value) {
-    msgEl.style.display = 'none';
-    input.classList.remove('error');
-    return true;
-  }
-  const edad = calcularEdad(input.value);
-  const minimo = isTitular ? 18 : 3;
-  const texto = isTitular
-    ? 'El titular debe ser mayor de 18 años.'
-    : 'Los acompañantes deben tener al menos 3 años.';
-  if (edad < minimo) {
-    input.classList.add('error');
-    msgEl.textContent = texto;
-    msgEl.style.display = 'block';
-    return false;
-  } else {
-    input.classList.remove('error');
-    msgEl.style.display = 'none';
-    return true;
-  }
-}
+    /* ═══════════════════════════ VALIDACIÓN EDAD ═══════════════════════════════ */
+    function calcularEdad(fechaISO) {
+      const nacimiento = new Date(fechaISO);
+      const hoy = new Date();
+      let edad = hoy.getFullYear() - nacimiento.getFullYear();
+      const m = hoy.getMonth() - nacimiento.getMonth();
+      if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
+      return edad;
+    }
+    function validarEdadPasajero(idx, input) {
+      const isTitular = idx === 0;
+      const msgEl = document.getElementById(`pax-${idx}-edad-msg`);
+      if (!input.value) {
+        msgEl.style.display = 'none';
+        input.classList.remove('error');
+        return true;
+      }
+      const edad = calcularEdad(input.value);
+      const minimo = isTitular ? 18 : 3;
+      const texto = isTitular
+        ? 'El titular debe ser mayor de 18 años.'
+        : 'Los acompañantes deben tener al menos 3 años.';
+      if (edad < minimo) {
+        input.classList.add('error');
+        msgEl.textContent = texto;
+        msgEl.style.display = 'block';
+        return false;
+      } else {
+        input.classList.remove('error');
+        msgEl.style.display = 'none';
+        return true;
+      }
+    }
 
-/* ═══════════════════════════ VERIFICACIÓN DNI ══════════════════════════════ */
-async function verificarDNIReniec(idx, dni) {
-  if (!dni || dni.length < 8) return;
-  const msgEl = document.getElementById(`pax-${idx}-dni-msg`);
-  const spinnerEl = document.getElementById(`pax-${idx}-dni-spinner`);
-  if (spinnerEl) spinnerEl.classList.remove('hidden');
-  msgEl.className = 'info-msg warn';
-  msgEl.textContent = 'Verificando datos…';
+    /* ═══════════════════════════ VERIFICACIÓN DNI ══════════════════════════════ */
+    async function verificarDNIReniec(idx, dni) {
+      if (!dni || dni.length < 8) return;
+      const msgEl = document.getElementById(`pax-${idx}-dni-msg`);
+      const spinnerEl = document.getElementById(`pax-${idx}-dni-spinner`);
+      if (spinnerEl) spinnerEl.classList.remove('hidden');
+      msgEl.className = 'info-msg warn';
+      msgEl.textContent = 'Verificando datos…';
 
-  if (dni in dniCache) {
-    if (spinnerEl) spinnerEl.classList.add('hidden');
-    if (dniCache[dni].success) {
-      rellenarPasajeroReniec(idx, dniCache[dni].data);
+      if (dni in dniCache) {
+        if (spinnerEl) spinnerEl.classList.add('hidden');
+        if (dniCache[dni].success) {
+          rellenarPasajeroReniec(idx, dniCache[dni].data);
+          msgEl.className = 'info-msg ok';
+          msgEl.innerHTML = `<span style="display:flex;align-items:center;gap:6px;"><i class="fas fa-check-circle"></i> Datos verificados con RENIEC <span class="verificape-badge"><i class="fas fa-shield-check"></i>VerificaPE</span></span>`;
+        } else {
+          msgEl.className = 'info-msg warn';
+          msgEl.textContent = dniCache[dni].error || 'No se encontraron datos. Completa manualmente.';
+        }
+        if (idx === 0) await buscarClientePorDNI(0, dni, msgEl);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${VERIFICAPE_API}/${dni}`, {
+          method: 'GET'
+        });
+        if (spinnerEl) spinnerEl.classList.add('hidden');
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          const mensajeError = error.message || 'No se encontraron datos en RENIEC.';
+          dniCache[dni] = { success: false, error: mensajeError };
+          msgEl.className = 'info-msg warn';
+          msgEl.textContent = mensajeError;
+          if (idx === 0) await buscarClientePorDNI(0, dni, msgEl);
+          return;
+        }
+        const responseData = await response.json();
+        if (!responseData.success || !responseData.data) throw new Error('Respuesta inválida');
+        const persona = responseData.data;
+        dniCache[dni] = { success: true, data: persona };
+        rellenarPasajeroReniec(idx, persona);
+        msgEl.className = 'info-msg ok';
+        msgEl.innerHTML = `<span style="display:flex;align-items:center;gap:6px;"><i class="fas fa-check-circle"></i> Datos verificados con RENIEC <span class="verificape-badge"><i class="fas fa-shield-check"></i>VerificaPE</span></span>`;
+        if (idx === 0) await buscarClientePorDNI(0, dni, msgEl);
+      } catch (e) {
+        console.error('Error verificando DNI:', e);
+        if (spinnerEl) spinnerEl.classList.add('hidden');
+        dniCache[dni] = { success: false, error: 'Error de conexión. Completa los datos manualmente.' };
+        msgEl.className = 'info-msg err';
+        msgEl.textContent = 'Error de conexión. Completa los datos manualmente.';
+        if (idx === 0) await buscarClientePorDNI(0, dni, msgEl);
+      }
+    }
+
+    function rellenarPasajeroReniec(idx, persona) {
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el && val != null && val !== '') el.value = val; };
+      const nombre = persona.names || '';
+      const apPat = persona.paternalSurname || '';
+      const apMat = persona.maternalSurname || '';
+      const apellido = `${apPat} ${apMat}`.trim();
+      const fechaRaw = persona.birthDate || '';
+      let fechaFormateada = '';
+      if (fechaRaw.includes('/')) {
+        const [d, m, y] = fechaRaw.split('/');
+        fechaFormateada = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+      }
+      setVal(`pax-${idx}-nombre`, nombre);
+      setVal(`pax-${idx}-apellido`, apellido);
+      setVal(`pax-${idx}-nacionalidad`, 'Peruana');
+      if (fechaFormateada) {
+        setVal(`pax-${idx}-fechanac`, fechaFormateada);
+        const fechaEl = document.getElementById(`pax-${idx}-fechanac`);
+        if (fechaEl) validarEdadPasajero(idx, fechaEl);
+      }
+    }
+
+    /* ═══════════════════════════ BÚSQUEDA BD POR DNI ═══════════════════════════ */
+    async function buscarClientePorDNI(idx, dni, msgEl) {
+      if (!msgEl) msgEl = document.getElementById(`pax-${idx}-dni-msg`);
+      if (dni in dniClienteCache) {
+        if (dniClienteCache[dni]) {
+          const cli = dniClienteCache[dni].data;
+          const correo = cli.correo || cli.Correo || '';
+          rellenarTitularDesdeCliente(cli);
+          if (correo) clienteCache[correo] = { id: dniClienteCache[dni].id, data: cli };
+          mostrarMsgClienteEncontrado(msgEl, cli);
+        }
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/Cliente`);
+        if (!res.ok) { dniClienteCache[dni] = null; return; }
+        let lista = [];
+        try { lista = await res.json(); } catch (_) { lista = []; }
+        if (!Array.isArray(lista)) lista = [];
+        const cliente = lista.find(c =>
+          (c.pasaporte || c.Pasaporte || '').trim().toLowerCase() === dni.trim().toLowerCase()
+        );
+        if (cliente?.iD_Cliente) {
+          dniClienteCache[dni] = { id: cliente.iD_Cliente, data: cliente };
+          const correo = cliente.correo || cliente.Correo || '';
+          if (correo) clienteCache[correo] = { id: cliente.iD_Cliente, data: cliente };
+          rellenarTitularDesdeCliente(cliente);
+          mostrarMsgClienteEncontrado(msgEl, cliente);
+        } else {
+          dniClienteCache[dni] = null;
+        }
+      } catch (e) {
+        console.warn('buscarClientePorDNI error:', e);
+        dniClienteCache[dni] = null;
+      }
+    }
+
+    function mostrarMsgClienteEncontrado(msgEl, cli) {
+      const nombre = `${cli.nombre || cli.Nombre || ''} ${cli.apellido || cli.Apellido || ''}`.trim();
       msgEl.className = 'info-msg ok';
-      msgEl.innerHTML = `<span style="display:flex;align-items:center;gap:6px;"><i class="fas fa-check-circle"></i> Datos verificados con RENIEC <span class="verificape-badge"><i class="fas fa-shield-check"></i>VerificaPE</span></span>`;
-    } else {
-      msgEl.className = 'info-msg warn';
-      msgEl.textContent = dniCache[dni].error || 'No se encontraron datos. Completa manualmente.';
-    }
-    if (idx === 0) await buscarClientePorDNI(0, dni, msgEl);
-    return;
-  }
-
-  try {
-    const response = await fetch(`${VERIFICAPE_API}/${dni}`, {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${VERIFICAPE_TOKEN}` }
-    });
-    if (spinnerEl) spinnerEl.classList.add('hidden');
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      const mensajeError = error.message || 'No se encontraron datos en RENIEC.';
-      dniCache[dni] = { success: false, error: mensajeError };
-      msgEl.className = 'info-msg warn';
-      msgEl.textContent = mensajeError;
-      if (idx === 0) await buscarClientePorDNI(0, dni, msgEl);
-      return;
-    }
-    const responseData = await response.json();
-    if (!responseData.success || !responseData.data) throw new Error('Respuesta inválida');
-    const persona = responseData.data;
-    dniCache[dni] = { success: true, data: persona };
-    rellenarPasajeroReniec(idx, persona);
-    msgEl.className = 'info-msg ok';
-    msgEl.innerHTML = `<span style="display:flex;align-items:center;gap:6px;"><i class="fas fa-check-circle"></i> Datos verificados con RENIEC <span class="verificape-badge"><i class="fas fa-shield-check"></i>VerificaPE</span></span>`;
-    if (idx === 0) await buscarClientePorDNI(0, dni, msgEl);
-  } catch (e) {
-    console.error('Error verificando DNI:', e);
-    if (spinnerEl) spinnerEl.classList.add('hidden');
-    dniCache[dni] = { success: false, error: 'Error de conexión. Completa los datos manualmente.' };
-    msgEl.className = 'info-msg err';
-    msgEl.textContent = 'Error de conexión. Completa los datos manualmente.';
-    if (idx === 0) await buscarClientePorDNI(0, dni, msgEl);
-  }
-}
-
-function rellenarPasajeroReniec(idx, persona) {
-  const setVal = (id, val) => { const el = document.getElementById(id); if (el && val != null && val !== '') el.value = val; };
-  const nombre   = persona.names            || '';
-  const apPat    = persona.paternalSurname  || '';
-  const apMat    = persona.maternalSurname  || '';
-  const apellido = `${apPat} ${apMat}`.trim();
-  const fechaRaw = persona.birthDate        || '';
-  let fechaFormateada = '';
-  if (fechaRaw.includes('/')) {
-    const [d, m, y] = fechaRaw.split('/');
-    fechaFormateada = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-  }
-  setVal(`pax-${idx}-nombre`,       nombre);
-  setVal(`pax-${idx}-apellido`,     apellido);
-  setVal(`pax-${idx}-nacionalidad`, 'Peruana');
-  if (fechaFormateada) {
-    setVal(`pax-${idx}-fechanac`, fechaFormateada);
-    const fechaEl = document.getElementById(`pax-${idx}-fechanac`);
-    if (fechaEl) validarEdadPasajero(idx, fechaEl);
-  }
-}
-
-/* ═══════════════════════════ BÚSQUEDA BD POR DNI ═══════════════════════════ */
-async function buscarClientePorDNI(idx, dni, msgEl) {
-  if (!msgEl) msgEl = document.getElementById(`pax-${idx}-dni-msg`);
-  if (dni in dniClienteCache) {
-    if (dniClienteCache[dni]) {
-      const cli = dniClienteCache[dni].data;
-      const correo = cli.correo || cli.Correo || '';
-      rellenarTitularDesdeCliente(cli);
-      if (correo) clienteCache[correo] = { id: dniClienteCache[dni].id, data: cli };
-      mostrarMsgClienteEncontrado(msgEl, cli);
-    }
-    return;
-  }
-  try {
-    const res = await fetch(`${API}/Cliente`);
-    if (!res.ok) { dniClienteCache[dni] = null; return; }
-    let lista = [];
-    try { lista = await res.json(); } catch (_) { lista = []; }
-    if (!Array.isArray(lista)) lista = [];
-    const cliente = lista.find(c =>
-      (c.pasaporte || c.Pasaporte || '').trim().toLowerCase() === dni.trim().toLowerCase()
-    );
-    if (cliente?.iD_Cliente) {
-      dniClienteCache[dni] = { id: cliente.iD_Cliente, data: cliente };
-      const correo = cliente.correo || cliente.Correo || '';
-      if (correo) clienteCache[correo] = { id: cliente.iD_Cliente, data: cliente };
-      rellenarTitularDesdeCliente(cliente);
-      mostrarMsgClienteEncontrado(msgEl, cliente);
-    } else {
-      dniClienteCache[dni] = null;
-    }
-  } catch (e) {
-    console.warn('buscarClientePorDNI error:', e);
-    dniClienteCache[dni] = null;
-  }
-}
-
-function mostrarMsgClienteEncontrado(msgEl, cli) {
-  const nombre = `${cli.nombre || cli.Nombre || ''} ${cli.apellido || cli.Apellido || ''}`.trim();
-  msgEl.className = 'info-msg ok';
-  msgEl.innerHTML = `
+      msgEl.innerHTML = `
     <span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
       <i class="fas fa-user-check"></i>
       Cliente registrado: <strong>${nombre}</strong>
       <span class="autocomplete-badge"><i class="fas fa-magic"></i>Datos autocompletos</span>
     </span>`;
-}
+    }
 
-function rellenarTitularDesdeCliente(cli) {
-  const fill = (id, val) => { const el = document.getElementById(id); if (el && val != null && String(val).trim() !== '') el.value = String(val).trim(); };
-  fill('pax-0-nombre',       cli.nombre       || cli.Nombre);
-  fill('pax-0-apellido',     cli.apellido      || cli.Apellido);
-  fill('pax-0-correo',       cli.correo        || cli.Correo);
-  fill('pax-0-telefono',     cli.telefono      || cli.Telefono);
-  fill('pax-0-direccion',    cli.direccion     || cli.Direccion);
-  fill('pax-0-nacionalidad', cli.nacionalidad  || cli.Nacionalidad);
-  fill('pax-0-dni',          cli.pasaporte     || cli.dni);
-  const fechaRaw = cli.fecha_Nacimiento || cli.fechaNacimiento || '';
-  if (fechaRaw && fechaRaw.includes('/')) {
-    const [d, m, y] = fechaRaw.split('/');
-    const fechaISO = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
-    const fechaEl = document.getElementById('pax-0-fechanac');
-    if (fechaEl) { fechaEl.value = fechaISO; validarEdadPasajero(0, fechaEl); }
-  }
-  const correoMsgEl = document.getElementById('pax-0-correo-msg');
-  if (correoMsgEl && (cli.correo || cli.Correo)) {
-    correoMsgEl.className = 'info-msg ok';
-    correoMsgEl.innerHTML = `<i class="fas fa-magic mr-1"></i>Correo autocompleto desde tu perfil`;
-  }
-}
-
-/* ═══════════════════════════ BÚSQUEDA POR CORREO ═══════════════════════════ */
-async function buscarClientePorCorreo(correo) {
-  if (!correo || !correo.includes('@')) return;
-  const msg = document.getElementById('pax-0-correo-msg');
-  msg.className = 'info-msg warn';
-  msg.innerText = 'Buscando...';
-  if (clienteCache[correo] !== undefined) {
-    if (clienteCache[correo]) {
-      rellenarTitularDesdeCliente(clienteCache[correo].data);
-      msg.className = 'info-msg ok';
-      msg.innerText = `Cliente encontrado: ${clienteCache[correo].data.nombre}`;
-    } else {
-      msg.className = 'info-msg';
-      msg.innerText = 'Nuevo cliente, se registrará al pagar.';
-    }
-    return;
-  }
-  try {
-    const resCheck = await fetch(`${API}/Cliente/email?correo=${encodeURIComponent(correo)}`);
-    if (resCheck.status === 404) { clienteCache[correo] = null; msg.className = 'info-msg'; msg.innerText = 'Nuevo cliente'; return; }
-    if (!resCheck.ok) throw new Error();
-    const listaRes = await fetch(`${API}/Cliente`);
-    const lista = await listaRes.json();
-    const cli = lista.find(c => (c.correo || c.Correo).toLowerCase() === correo.toLowerCase());
-    if (cli) {
-      clienteCache[correo] = { id: cli.iD_Cliente, data: cli };
-      rellenarTitularDesdeCliente(cli);
-      msg.className = 'info-msg ok';
-      msg.innerText = `Cliente registrado: ${cli.nombre}`;
-    } else {
-      clienteCache[correo] = null;
-      msg.className = 'info-msg';
-      msg.innerText = 'Nuevo cliente';
-    }
-  } catch (e) { msg.className = 'info-msg err'; msg.innerText = 'Error verificando.'; }
-}
-
-/* ═══════════════════════════ VALIDACIÓN GENERAL ════════════════════════════ */
-function validarPasajeros() {
-  for (let i = 0; i < numeroPax; i++) {
-    const isTitular = i === 0;
-    const campos = [
-      { id: `pax-${i}-dni`,         label: 'DNI/Pasaporte' },
-      { id: `pax-${i}-nombre`,       label: 'Nombre' },
-      { id: `pax-${i}-apellido`,     label: 'Apellido' },
-      { id: `pax-${i}-nacionalidad`, label: 'Nacionalidad' },
-      { id: `pax-${i}-fechanac`,     label: 'Fecha de nacimiento' },
-    ];
-    if (isTitular) {
-      campos.push({ id: 'pax-0-correo',    label: 'Correo' });
-      campos.push({ id: 'pax-0-telefono',  label: 'Teléfono' });
-      campos.push({ id: 'pax-0-direccion', label: 'Dirección' });
-    }
-    for (const campo of campos) {
-      const el = document.getElementById(campo.id);
-      if (!el || !el.value.trim()) {
-        el.classList.add('error');
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        alert(`Pasajero ${i + 1}: el campo "${campo.label}" es obligatorio.`);
-        return false;
-      } else el.classList.remove('error');
-    }
-    const fechaEl = document.getElementById(`pax-${i}-fechanac`);
-    const minimo = isTitular ? 18 : 3;
-    if (fechaEl && fechaEl.value) {
-      const edad = calcularEdad(fechaEl.value);
-      if (edad < minimo) {
-        fechaEl.classList.add('error');
-        const msgEl = document.getElementById(`pax-${i}-edad-msg`);
-        if (msgEl) { msgEl.textContent = isTitular ? 'El titular debe ser mayor de 18 años.' : `El pasajero ${i+1} debe tener al menos 3 años.`; msgEl.style.display = 'block'; }
-        fechaEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        alert(isTitular ? 'El titular debe ser mayor de 18 años.' : `El pasajero ${i+1} debe tener al menos 3 años.`);
-        return false;
+    function rellenarTitularDesdeCliente(cli) {
+      const fill = (id, val) => { const el = document.getElementById(id); if (el && val != null && String(val).trim() !== '') el.value = String(val).trim(); };
+      fill('pax-0-nombre', cli.nombre || cli.Nombre);
+      fill('pax-0-apellido', cli.apellido || cli.Apellido);
+      fill('pax-0-correo', cli.correo || cli.Correo);
+      fill('pax-0-telefono', cli.telefono || cli.Telefono);
+      fill('pax-0-direccion', cli.direccion || cli.Direccion);
+      fill('pax-0-nacionalidad', cli.nacionalidad || cli.Nacionalidad);
+      fill('pax-0-dni', cli.pasaporte || cli.dni);
+      const fechaRaw = cli.fecha_Nacimiento || cli.fechaNacimiento || '';
+      if (fechaRaw && fechaRaw.includes('/')) {
+        const [d, m, y] = fechaRaw.split('/');
+        const fechaISO = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+        const fechaEl = document.getElementById('pax-0-fechanac');
+        if (fechaEl) { fechaEl.value = fechaISO; validarEdadPasajero(0, fechaEl); }
+      }
+      const correoMsgEl = document.getElementById('pax-0-correo-msg');
+      if (correoMsgEl && (cli.correo || cli.Correo)) {
+        correoMsgEl.className = 'info-msg ok';
+        correoMsgEl.innerHTML = `<i class="fas fa-magic mr-1"></i>Correo autocompleto desde tu perfil`;
       }
     }
-  }
-  return true;
-}
 
-function getDatosPasajero(idx) {
-  const get = id => document.getElementById(id)?.value?.trim() || '';
-  const isTitular = idx === 0;
-  return {
-    correo:       isTitular ? get('pax-0-correo')    : '',
-    nombre:       get(`pax-${idx}-nombre`),
-    apellido:     get(`pax-${idx}-apellido`),
-    pasaporte:    get(`pax-${idx}-dni`),
-    nacionalidad: get(`pax-${idx}-nacionalidad`),
-    fechaNac:     get(`pax-${idx}-fechanac`),
-    telefono:     isTitular ? get('pax-0-telefono')  : '',
-    direccion:    isTitular ? get('pax-0-direccion') : '',
-  };
-}
-
-/* ═══════════════════════════ RESUMEN DE PAGO ═══════════════════════════════ */
-function actualizarResumen() {
-  if (!paquete) return;
-  const precio = parseFloat(paquete.precio_Base || 0);
-  const total = precio * numeroPax;
-  const igv = total - (total / 1.18);
-  const subtotal = total - igv;
-  document.getElementById('sum-unit').innerText = `S/ ${precio.toFixed(2)}`;
-  document.getElementById('sum-qty').innerText = numeroPax;
-  document.getElementById('sum-subtotal').innerText = `S/ ${subtotal.toFixed(2)}`;
-  document.getElementById('sum-igv').innerText = `S/ ${igv.toFixed(2)}`;
-  document.getElementById('sum-total').innerText = `S/ ${total.toFixed(2)}`;
-  document.getElementById('modal-total').innerText = `S/ ${total.toFixed(2)}`;
-}
-
-/* ═══════════════════════════ TARJETA ═══════════════════════════════════════ */
-function abrirModalPago() { if(validarPasajeros()) { actualizarResumen(); document.getElementById('modal-pago').classList.add('open'); } }
-function cerrarModalPago() { document.getElementById('modal-pago').classList.remove('open'); }
-function formatCardNum(i) { let v=i.value.replace(/\D/g,'').slice(0,16); i.value=v.replace(/(.{4})/g,'$1 ').trim(); }
-function formatExpiry(i) { let v=i.value.replace(/\D/g,'').slice(0,4); if(v.length>2) v=v.slice(0,2)+'/'+v.slice(2); i.value=v; }
-function luhn(num) { let sum=0,alt=false; for(let i=num.length-1;i>=0;i--){ let n=parseInt(num[i]); if(alt){n*=2;if(n>9)n-=9;} sum+=n; alt=!alt; } return sum%10===0; }
-function validarTarjeta() {
-  let ok=true;
-  const show=(id,msg)=>{ const el=document.getElementById(id); el.classList.remove('hidden'); el.innerText=msg; ok=false; };
-  const hide=(id)=>document.getElementById(id).classList.add('hidden');
-  const num=document.getElementById('card-num').value.replace(/\s/g,'');
-  if(!num || num.length<13 || !luhn(num)) show('err-card-num','Número inválido'); else hide('err-card-num');
-  const exp=document.getElementById('card-exp').value;
-  if(!/^\d{2}\/\d{2}$/.test(exp)) show('err-card-exp','Formato MM/AA'); else hide('err-card-exp');
-  const cvv=document.getElementById('card-cvv').value;
-  if(!cvv || cvv.length<3) show('err-card-cvv','CVV requerido'); else hide('err-card-cvv');
-  if(!document.getElementById('card-name').value.trim()) show('err-card-name','Nombre requerido'); else hide('err-card-name');
-  if(!document.getElementById('card-doc').value.trim()) show('err-card-doc','Documento requerido'); else hide('err-card-doc');
-  return ok;
-}
-
-/* ═══════════════════════════ FORMATO DE FECHA ══════════════════════════════ */
-/**
- * Retorna la fecha actual en formato "31/05/2026 11:24 pm" (hora exacta, 12h)
- */
-function formatearFechaReserva() {
-  const ahora = new Date();
-  const dia   = String(ahora.getDate()).padStart(2, '0');
-  const mes   = String(ahora.getMonth() + 1).padStart(2, '0');
-  const anio  = ahora.getFullYear();
-  let horas   = ahora.getHours();
-  const minutos = String(ahora.getMinutes()).padStart(2, '0');
-  const ampm   = horas >= 12 ? 'pm' : 'am';
-  horas = horas % 12 || 12; // 0 se convierte en 12 (medianoche)
-  return `${dia}/${mes}/${anio} ${String(horas).padStart(2, '0')}:${minutos} ${ampm}`;
-}
-
-function setBtnLoading(loading) {
-  const btn = document.getElementById('btn-confirmar');
-  const txt = document.getElementById('btn-confirmar-txt');
-  const spn = document.getElementById('btn-confirmar-spinner');
-  btn.disabled = loading;
-  txt.classList.toggle('hidden', loading);
-  spn.classList.toggle('hidden', !loading);
-}
-
-/* ═══════════════════════════ PROCESAR PAGO ═════════════════════════════════ */
-async function procesarPago() {
-  if (!validarTarjeta()) return;
-  setBtnLoading(true);
-  document.getElementById('modal-error').classList.add('hidden');
-
-  try {
-    const titular = getDatosPasajero(0);
-    const correo  = titular.correo;
-    const total   = paquete.precio_Base * numeroPax;
-    let idCliente = null;
-
-    // Buscar cliente por DNI o correo
-    const dniTitular = titular.pasaporte;
-    if (dniClienteCache[dniTitular]?.id) {
-      idCliente = dniClienteCache[dniTitular].id;
-    } else if (clienteCache[correo]?.id) {
-      idCliente = clienteCache[correo].id;
-    } else {
+    /* ═══════════════════════════ BÚSQUEDA POR CORREO ═══════════════════════════ */
+    async function buscarClientePorCorreo(correo) {
+      if (!correo || !correo.includes('@')) return;
+      const msg = document.getElementById('pax-0-correo-msg');
+      msg.className = 'info-msg warn';
+      msg.innerText = 'Buscando...';
+      if (clienteCache[correo] !== undefined) {
+        if (clienteCache[correo]) {
+          rellenarTitularDesdeCliente(clienteCache[correo].data);
+          msg.className = 'info-msg ok';
+          msg.innerText = `Cliente encontrado: ${clienteCache[correo].data.nombre}`;
+        } else {
+          msg.className = 'info-msg';
+          msg.innerText = 'Nuevo cliente, se registrará al pagar.';
+        }
+        return;
+      }
       try {
         const resCheck = await fetch(`${API}/Cliente/email?correo=${encodeURIComponent(correo)}`);
-        if (resCheck.ok) {
-          const listaRes = await fetch(`${API}/Cliente`);
-          const lista = await listaRes.json();
-          const cli = lista.find(c => (c.correo || c.Correo).toLowerCase() === correo.toLowerCase());
-          if (cli) {
-            idCliente = cli.iD_Cliente;
-            clienteCache[correo] = { id: cli.iD_Cliente, data: cli };
+        if (resCheck.status === 404) { clienteCache[correo] = null; msg.className = 'info-msg'; msg.innerText = 'Nuevo cliente'; return; }
+        if (!resCheck.ok) throw new Error();
+        const listaRes = await fetch(`${API}/Cliente`);
+        const lista = await listaRes.json();
+        const cli = lista.find(c => (c.correo || c.Correo).toLowerCase() === correo.toLowerCase());
+        if (cli) {
+          clienteCache[correo] = { id: cli.iD_Cliente, data: cli };
+          rellenarTitularDesdeCliente(cli);
+          msg.className = 'info-msg ok';
+          msg.innerText = `Cliente registrado: ${cli.nombre}`;
+        } else {
+          clienteCache[correo] = null;
+          msg.className = 'info-msg';
+          msg.innerText = 'Nuevo cliente';
+        }
+      } catch (e) { msg.className = 'info-msg err'; msg.innerText = 'Error verificando.'; }
+    }
+
+    /* ═══════════════════════════ VALIDACIÓN GENERAL ════════════════════════════ */
+    function validarPasajeros() {
+      for (let i = 0; i < numeroPax; i++) {
+        const isTitular = i === 0;
+        const campos = [
+          { id: `pax-${i}-dni`, label: 'DNI/Pasaporte' },
+          { id: `pax-${i}-nombre`, label: 'Nombre' },
+          { id: `pax-${i}-apellido`, label: 'Apellido' },
+          { id: `pax-${i}-nacionalidad`, label: 'Nacionalidad' },
+          { id: `pax-${i}-fechanac`, label: 'Fecha de nacimiento' },
+        ];
+        if (isTitular) {
+          campos.push({ id: 'pax-0-correo', label: 'Correo' });
+          campos.push({ id: 'pax-0-telefono', label: 'Teléfono' });
+          campos.push({ id: 'pax-0-direccion', label: 'Dirección' });
+        }
+        for (const campo of campos) {
+          const el = document.getElementById(campo.id);
+          if (!el || !el.value.trim()) {
+            el.classList.add('error');
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            alert(`Pasajero ${i + 1}: el campo "${campo.label}" es obligatorio.`);
+            return false;
+          } else el.classList.remove('error');
+        }
+        const fechaEl = document.getElementById(`pax-${i}-fechanac`);
+        const minimo = isTitular ? 18 : 3;
+        if (fechaEl && fechaEl.value) {
+          const edad = calcularEdad(fechaEl.value);
+          if (edad < minimo) {
+            fechaEl.classList.add('error');
+            const msgEl = document.getElementById(`pax-${i}-edad-msg`);
+            if (msgEl) { msgEl.textContent = isTitular ? 'El titular debe ser mayor de 18 años.' : `El pasajero ${i + 1} debe tener al menos 3 años.`; msgEl.style.display = 'block'; }
+            fechaEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            alert(isTitular ? 'El titular debe ser mayor de 18 años.' : `El pasajero ${i + 1} debe tener al menos 3 años.`);
+            return false;
           }
         }
-      } catch (e) { /* ignorar */ }
+      }
+      return true;
+    }
 
-      if (!idCliente) {
-        // Crear nuevo cliente
-        const nuevo = {
-          iD_Usuario: 1,
-          frecuencia_Viajero: 'Normal',
-          correo: correo,
-          nombre: titular.nombre,
-          apellido: titular.apellido,
-          telefono: titular.telefono,
-          direccion: titular.direccion,
-          nacionalidad: titular.nacionalidad,
-          pasaporte: titular.pasaporte,
-          fecha_Nacimiento: new Date(titular.fechaNac).toLocaleDateString('es-PE') // DD/MM/YYYY
+    function getDatosPasajero(idx) {
+      const get = id => document.getElementById(id)?.value?.trim() || '';
+      const isTitular = idx === 0;
+      return {
+        correo: isTitular ? get('pax-0-correo') : '',
+        nombre: get(`pax-${idx}-nombre`),
+        apellido: get(`pax-${idx}-apellido`),
+        pasaporte: get(`pax-${idx}-dni`),
+        nacionalidad: get(`pax-${idx}-nacionalidad`),
+        fechaNac: get(`pax-${idx}-fechanac`),
+        telefono: isTitular ? get('pax-0-telefono') : '',
+        direccion: isTitular ? get('pax-0-direccion') : '',
+      };
+    }
+
+    /* ═══════════════════════════ RESUMEN DE PAGO ═══════════════════════════════ */
+    function actualizarResumen() {
+      if (!paquete) return;
+      const precio = parseFloat(paquete.precio_Base || 0);
+      const total = precio * numeroPax;
+      const igv = total - (total / 1.18);
+      const subtotal = total - igv;
+      document.getElementById('sum-unit').innerText = `S/ ${precio.toFixed(2)}`;
+      document.getElementById('sum-qty').innerText = numeroPax;
+      document.getElementById('sum-subtotal').innerText = `S/ ${subtotal.toFixed(2)}`;
+      document.getElementById('sum-igv').innerText = `S/ ${igv.toFixed(2)}`;
+      document.getElementById('sum-total').innerText = `S/ ${total.toFixed(2)}`;
+      document.getElementById('modal-total').innerText = `S/ ${total.toFixed(2)}`;
+    }
+
+    /* ═══════════════════════════ TARJETA ═══════════════════════════════════════ */
+    function abrirModalPago() { if (validarPasajeros()) { actualizarResumen(); document.getElementById('modal-pago').classList.add('open'); } }
+    function cerrarModalPago() { document.getElementById('modal-pago').classList.remove('open'); }
+    function formatCardNum(i) { let v = i.value.replace(/\D/g, '').slice(0, 16); i.value = v.replace(/(.{4})/g, '$1 ').trim(); }
+    function formatExpiry(i) { let v = i.value.replace(/\D/g, '').slice(0, 4); if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2); i.value = v; }
+    function luhn(num) { let sum = 0, alt = false; for (let i = num.length - 1; i >= 0; i--) { let n = parseInt(num[i]); if (alt) { n *= 2; if (n > 9) n -= 9; } sum += n; alt = !alt; } return sum % 10 === 0; }
+    function validarTarjeta() {
+      let ok = true;
+      const show = (id, msg) => { const el = document.getElementById(id); el.classList.remove('hidden'); el.innerText = msg; ok = false; };
+      const hide = (id) => document.getElementById(id).classList.add('hidden');
+      const num = document.getElementById('card-num').value.replace(/\s/g, '');
+      if (!num || num.length < 13 || !luhn(num)) show('err-card-num', 'Número inválido'); else hide('err-card-num');
+      const exp = document.getElementById('card-exp').value;
+      if (!/^\d{2}\/\d{2}$/.test(exp)) show('err-card-exp', 'Formato MM/AA'); else hide('err-card-exp');
+      const cvv = document.getElementById('card-cvv').value;
+      if (!cvv || cvv.length < 3) show('err-card-cvv', 'CVV requerido'); else hide('err-card-cvv');
+      if (!document.getElementById('card-name').value.trim()) show('err-card-name', 'Nombre requerido'); else hide('err-card-name');
+      if (!document.getElementById('card-doc').value.trim()) show('err-card-doc', 'Documento requerido'); else hide('err-card-doc');
+      return ok;
+    }
+
+    /* ═══════════════════════════ FORMATO DE FECHA ══════════════════════════════ */
+    /**
+     * Retorna la fecha actual en formato "31/05/2026 11:24 pm" (hora exacta, 12h)
+     */
+    function formatearFechaReserva() {
+      const ahora = new Date();
+      const dia = String(ahora.getDate()).padStart(2, '0');
+      const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+      const anio = ahora.getFullYear();
+      let horas = ahora.getHours();
+      const minutos = String(ahora.getMinutes()).padStart(2, '0');
+      const ampm = horas >= 12 ? 'pm' : 'am';
+      horas = horas % 12 || 12; // 0 se convierte en 12 (medianoche)
+      return `${dia}/${mes}/${anio} ${String(horas).padStart(2, '0')}:${minutos} ${ampm}`;
+    }
+
+    function setBtnLoading(loading) {
+      const btn = document.getElementById('btn-confirmar');
+      const txt = document.getElementById('btn-confirmar-txt');
+      const spn = document.getElementById('btn-confirmar-spinner');
+      btn.disabled = loading;
+      txt.classList.toggle('hidden', loading);
+      spn.classList.toggle('hidden', !loading);
+    }
+
+    /* ═══════════════════════════ PROCESAR PAGO ═════════════════════════════════ */
+    async function procesarPago() {
+      if (!validarTarjeta()) return;
+      setBtnLoading(true);
+      document.getElementById('modal-error').classList.add('hidden');
+
+      try {
+        const titular = getDatosPasajero(0);
+        const correo = titular.correo;
+        const total = paquete.precio_Base * numeroPax;
+        let idCliente = null;
+
+        // Buscar cliente por DNI o correo
+        const dniTitular = titular.pasaporte;
+        if (dniClienteCache[dniTitular]?.id) {
+          idCliente = dniClienteCache[dniTitular].id;
+        } else if (clienteCache[correo]?.id) {
+          idCliente = clienteCache[correo].id;
+        } else {
+          try {
+            const resCheck = await fetch(`${API}/Cliente/email?correo=${encodeURIComponent(correo)}`);
+            if (resCheck.ok) {
+              const listaRes = await fetch(`${API}/Cliente`);
+              const lista = await listaRes.json();
+              const cli = lista.find(c => (c.correo || c.Correo).toLowerCase() === correo.toLowerCase());
+              if (cli) {
+                idCliente = cli.iD_Cliente;
+                clienteCache[correo] = { id: cli.iD_Cliente, data: cli };
+              }
+            }
+          } catch (e) { /* ignorar */ }
+
+          if (!idCliente) {
+            // Crear nuevo cliente
+            const nuevo = {
+              iD_Usuario: 1,
+              frecuencia_Viajero: 'Normal',
+              correo: correo,
+              nombre: titular.nombre,
+              apellido: titular.apellido,
+              telefono: titular.telefono,
+              direccion: titular.direccion,
+              nacionalidad: titular.nacionalidad,
+              pasaporte: titular.pasaporte,
+              fecha_Nacimiento: new Date(titular.fechaNac).toLocaleDateString('es-PE') // DD/MM/YYYY
+            };
+            const resPost = await fetch(`${API}/Cliente`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(nuevo)
+            });
+            if (!resPost.ok) throw new Error('Error al crear cliente');
+            const creado = await resPost.json();
+            idCliente = creado.iD_Cliente;
+            clienteCache[correo] = { id: idCliente, data: creado };
+            dniClienteCache[dniTitular] = { id: idCliente, data: creado };
+          }
+        }
+
+        // Crear reserva con fecha formateada
+        const idPaquete = parseInt(new URLSearchParams(location.search).get('iD_Paquete'));
+        let obs = '';
+        for (let i = 1; i < numeroPax; i++) {
+          const p = getDatosPasajero(i);
+          obs += `Pax ${i + 1}: ${p.nombre} ${p.apellido} – Doc: ${p.pasaporte} – Nac: ${p.nacionalidad} | `;
+        }
+        const fechaReservaFormateada = formatearFechaReserva(); // ← usa el formato pedido
+        const reservaBody = {
+          iD_Cliente: idCliente,
+          iD_Paquete: idPaquete,
+          fecha_Reserva: fechaReservaFormateada,
+          numero_Personas: numeroPax,
+          precio_Total: total,
+          estatus: 'Pagado',
+          observaciones: obs || 'Sin acompañantes'
         };
-        const resPost = await fetch(`${API}/Cliente`, {
+        const resReserva = await fetch(`${API}/Reserva`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(nuevo)
+          body: JSON.stringify(reservaBody)
         });
-        if (!resPost.ok) throw new Error('Error al crear cliente');
-        const creado = await resPost.json();
-        idCliente = creado.iD_Cliente;
-        clienteCache[correo] = { id: idCliente, data: creado };
-        dniClienteCache[dniTitular] = { id: idCliente, data: creado };
+        if (!resReserva.ok) throw new Error('Error al crear reserva');
+        const reserva = await resReserva.json();
+        const idReserva = reserva.iD_Reserva;
+
+        // Registrar pago
+        const numTransaccion = `ILL-${Date.now()}`;
+        const pagoBody = {
+          iD_Reserva: idReserva,
+          fecha_Pago: new Date().toISOString(),
+          metodo_Pago: 'Tarjeta',
+          monto: total,
+          numero_Transaccion: numTransaccion
+        };
+        await fetch(`${API}/Pago`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pagoBody)
+        });
+
+        cerrarModalPago();
+        mostrarBoleta(idReserva, total, titular, numTransaccion, fechaReservaFormateada);
+
+      } catch (e) {
+        const errEl = document.getElementById('modal-error');
+        errEl.innerText = e.message || 'Error en el pago';
+        errEl.classList.remove('hidden');
+      } finally {
+        setBtnLoading(false);
       }
     }
 
-    // Crear reserva con fecha formateada
-    const idPaquete = parseInt(new URLSearchParams(location.search).get('iD_Paquete'));
-    let obs = '';
-    for (let i = 1; i < numeroPax; i++) {
-      const p = getDatosPasajero(i);
-      obs += `Pax ${i+1}: ${p.nombre} ${p.apellido} – Doc: ${p.pasaporte} – Nac: ${p.nacionalidad} | `;
-    }
-    const fechaReservaFormateada = formatearFechaReserva(); // ← usa el formato pedido
-    const reservaBody = {
-      iD_Cliente: idCliente,
-      iD_Paquete: idPaquete,
-      fecha_Reserva: fechaReservaFormateada,
-      numero_Personas: numeroPax,
-      precio_Total: total,
-      estatus: 'Pagado',
-      observaciones: obs || 'Sin acompañantes'
-    };
-    const resReserva = await fetch(`${API}/Reserva`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(reservaBody)
-    });
-    if (!resReserva.ok) throw new Error('Error al crear reserva');
-    const reserva = await resReserva.json();
-    const idReserva = reserva.iD_Reserva;
+    /* ═══════════════════════════ BOLETA MEJORADA (COMPROBANTE) ═════════════════ */
+    function mostrarBoleta(idReserva, total, titular, numTransaccion, fechaReservaStr) {
+      document.getElementById('checkout-wrapper').style.display = 'none';
+      const precioUnit = paquete.precio_Base;
+      const igv = total - (total / 1.18);
+      const subtotal = total - igv;
+      const nroOperacion = `B001-${idReserva}`;
+      const fechaEmision = fechaReservaStr || formatearFechaReserva();
 
-    // Registrar pago
-    const numTransaccion = `ILL-${Date.now()}`;
-    const pagoBody = {
-      iD_Reserva: idReserva,
-      fecha_Pago: new Date().toISOString(),
-      metodo_Pago: 'Tarjeta',
-      monto: total,
-      numero_Transaccion: numTransaccion
-    };
-    await fetch(`${API}/Pago`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(pagoBody)
-    });
-
-    cerrarModalPago();
-    mostrarBoleta(idReserva, total, titular, numTransaccion, fechaReservaFormateada);
-
-  } catch (e) {
-    const errEl = document.getElementById('modal-error');
-    errEl.innerText = e.message || 'Error en el pago';
-    errEl.classList.remove('hidden');
-  } finally {
-    setBtnLoading(false);
-  }
-}
-
-/* ═══════════════════════════ BOLETA MEJORADA (COMPROBANTE) ═════════════════ */
-function mostrarBoleta(idReserva, total, titular, numTransaccion, fechaReservaStr) {
-  document.getElementById('checkout-wrapper').style.display = 'none';
-  const precioUnit = paquete.precio_Base;
-  const igv = total - (total / 1.18);
-  const subtotal = total - igv;
-  const nroOperacion = `B001-${idReserva}`;
-  const fechaEmision = fechaReservaStr || formatearFechaReserva();
-
-  // Construir pasajeros
-  let pasajerosHtml = '';
-  for (let i = 0; i < numeroPax; i++) {
-    const p = getDatosPasajero(i);
-    const tipo = i === 0 ? 'badge-titular' : 'badge-acomp';
-    const etiqueta = i === 0 ? 'TITULAR' : 'ACOMP.';
-    pasajerosHtml += `
+      // Construir pasajeros
+      let pasajerosHtml = '';
+      for (let i = 0; i < numeroPax; i++) {
+        const p = getDatosPasajero(i);
+        const tipo = i === 0 ? 'badge-titular' : 'badge-acomp';
+        const etiqueta = i === 0 ? 'TITULAR' : 'ACOMP.';
+        pasajerosHtml += `
       <div class="pasajero-card-boleta">
         <div class="pasajero-header">
-          <span>${i+1}. ${p.nombre} ${p.apellido}</span>
+          <span>${i + 1}. ${p.nombre} ${p.apellido}</span>
           <span class="${tipo}">${etiqueta}</span>
         </div>
         <div class="pasajero-doc">Doc: ${p.pasaporte} | Nac: ${p.nacionalidad}</div>
       </div>`;
-  }
+      }
 
-  const html = `
+      const html = `
     <!-- ENCABEZADO -->
     <div class="encabezado">
       <img src="assets/img/logo.png" alt="Illariy Travel" class="logo-boleta" onerror="this.style.display='none'" />
@@ -1079,11 +1235,12 @@ function mostrarBoleta(idReserva, total, titular, numTransaccion, fechaReservaSt
     </div>
   `;
 
-  document.getElementById('boleta-content').innerHTML = html;
-  document.getElementById('boleta-wrapper').style.display = 'block';
-  window.scrollTo(0, 0);
-}
-</script>
+      document.getElementById('boleta-content').innerHTML = html;
+      document.getElementById('boleta-wrapper').style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+  </script>
 </body>
 <script src="assets/js/chatbot.js"></script>
+
 </html>
