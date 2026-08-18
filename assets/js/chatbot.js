@@ -507,16 +507,30 @@ async function enviarMensaje() {
         const respuesta = await consultarGroq(texto);
         quitarTyping();
         let respuestaFinal = respuesta;
+
+        // Si la respuesta es el mensaje genérico, agregar enlace a WhatsApp
+        if (respuesta.includes("contacta a nuestro asesor por WhatsApp")) {
+            respuestaFinal += `<br><a href="${WHATSAPP_LINK}" target="_blank" class="whatsapp-link">📞 Chatear con un asesor →</a>`;
+        }
+        // También si el usuario menciona "asesor", "persona", "hablar", mostrar enlace directamente
+        if (textoLower.includes("asesor") || textoLower.includes("persona") || textoLower.includes("hablar")) {
+            respuestaFinal = `📞 Puedes contactar a un asesor por WhatsApp: <a href="${WHATSAPP_LINK}" target="_blank" class="whatsapp-link">Enviar mensaje →</a>`;
+        }
+
+        // Agregar enlaces de reserva para paquetes mencionados
         for (const p of paquetes) {
             if (respuestaFinal.includes(p.nombre)) {
                 const link = `${window.location.origin}/destino-single.html?iD_Paquete=${p.iD_Paquete}`;
                 respuestaFinal += `<br><a href="${link}" target="_blank" class="enlace-reserva">🔗 Reservar ${p.nombre}</a>`;
             }
         }
+
         agregarMensaje(respuestaFinal, 'bot');
         historial.push({ role: 'assistant', content: respuesta });
         guardarEstado();
     } catch (error) {
+        // Manejo de errores...
+
         quitarTyping();
         console.error(error);
         agregarMensaje(`⚠️ Error de conexión. Por favor contacta a un asesor: <a href="${WHATSAPP_LINK}" target="_blank" class="whatsapp-link">WhatsApp →</a>`, 'bot');
