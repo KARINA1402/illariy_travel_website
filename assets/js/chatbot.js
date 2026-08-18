@@ -506,59 +506,63 @@ async function enviarMensaje() {
     try {
         const respuesta = await consultarGroq(texto);
         quitarTyping();
-
         // El backend ya arma la respuesta limpia y los botones (mismas clases whatsapp-link / enlace-reserva)
         agregarMensaje(respuesta, 'bot');
         historial.push({ role: 'assistant', content: respuesta });
         guardarEstado();
     } catch (error) {
+        quitarTyping();
+        console.error(error);
+        agregarMensaje(`⚠️ Error de conexión. Por favor contacta a un asesor: <a href="${WHATSAPP_LINK}" target="_blank" class="whatsapp-link">WhatsApp →</a>`, 'bot');
+        guardarEstado();
     }
+}
 
-    async function consultarGroq(pregunta) {
-        try {
-            console.log('📤 Enviando pregunta:', pregunta);
+async function consultarGroq(pregunta) {
+    try {
+        console.log('📤 Enviando pregunta:', pregunta);
 
-            const response = await fetch('https://illary.bsite.net/api/Chat/consultar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    pregunta: pregunta,
-                    nombre: nombreUsuario,
-                    historial: historial.slice(-3),
-                    paquetes: paquetes
-                })
-            });
+        const response = await fetch('https://illary.bsite.net/api/Chat/consultar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                pregunta: pregunta,
+                nombre: nombreUsuario,
+                historial: historial.slice(-3),
+                paquetes: paquetes
+            })
+        });
 
-            console.log('📥 Respuesta HTTP:', response.status, response.statusText);
-            console.log('📋 Headers:', response.headers);
+        console.log('📥 Respuesta HTTP:', response.status, response.statusText);
+        console.log('📋 Headers:', response.headers);
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('❌ Error del servidor:', errorData);
-                throw new Error(errorData.error || `HTTP ${response.status}`);
-            }
-
-            const data = await response.json();
-            let respuesta = data.respuesta;
-            if (!respuesta || respuesta.trim() === '') {
-                respuesta = 'No pude procesar tu consulta en este momento. ¿Puedes intentar de nuevo?';
-            }
-            return respuesta;
-        } catch (error) {
-            console.error('🔥 Error en consultarGroq:', error);
-            throw error;
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('❌ Error del servidor:', errorData);
+            throw new Error(errorData.error || `HTTP ${response.status}`);
         }
-    }
 
-    function escapeHtml(str) {
-        return str.replace(/[&<>]/g, function (m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\n]/g, '<br>');
+        const data = await response.json();
+        let respuesta = data.respuesta;
+        if (!respuesta || respuesta.trim() === '') {
+            respuesta = 'No pude procesar tu consulta en este momento. ¿Puedes intentar de nuevo?';
+        }
+        return respuesta;
+    } catch (error) {
+        console.error('🔥 Error en consultarGroq:', error);
+        throw error;
     }
+}
 
-    document.addEventListener('DOMContentLoaded', crearWidgetChat);
+function escapeHtml(str) {
+    return str.replace(/[&<>]/g, function (m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    }).replace(/[\n]/g, '<br>');
+}
+
+document.addEventListener('DOMContentLoaded', crearWidgetChat);
