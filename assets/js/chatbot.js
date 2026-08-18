@@ -536,7 +536,7 @@ async function consultarGroq(pregunta) {
             body: JSON.stringify({
                 pregunta: pregunta,
                 nombre: nombreUsuario,
-                historial: historial.slice(-6),
+                historial: historial.slice(-3),
                 paquetes: paquetes
             })
         });
@@ -551,15 +551,11 @@ async function consultarGroq(pregunta) {
         }
 
         const data = await response.json();
-        console.log('Respuesta del backend:', data);
-        console.log('✅ Datos recibidos:', data);
-        console.log('💬 Respuesta del bot:', data.respuesta);
-
-        if (data.respuesta) {
-            return data.respuesta;
-        } else {
-            throw new Error('Respuesta sin contenido');
+        let respuesta = data.respuesta;
+        if (!respuesta || respuesta.trim() === '') {
+            respuesta = 'No pude procesar tu consulta en este momento. ¿Puedes intentar de nuevo?';
         }
+        return respuesta;
     } catch (error) {
         console.error('🔥 Error en consultarGroq:', error);
         throw error;
