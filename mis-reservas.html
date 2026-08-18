@@ -13,9 +13,6 @@
       font-family: 'Inter', sans-serif;
       background: #0A0A0A;
       color: #F5F5F5;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
     .field {
       background: #1F1F1F;
@@ -63,10 +60,9 @@
       font-weight: 700;
       text-transform: uppercase;
     }
-    .badge-registrado { background: #10B981; color: white; }
-    .badge-pendiente { background: #F59E0B; color: black; }
-    .badge-cancelado { background: #EF4444; color: white; }
-    .badge-finalizado { background: #6B7280; color: white; }
+    .badge-proximo { background: #3B82F6; color: white; }   /* Azul para futuro */
+    .badge-finalizado { background: #6B7280; color: white; } /* Gris para pasado */
+    .badge-registrado { background: #10B981; color: white; } /* Verde para registrado (fallback) */
     .detalle-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -95,11 +91,26 @@
         min-width: 80px;
       }
     }
-    main {
-      flex: 1;
+    /* Mensaje inicial */
+    .mensaje-inicial {
+      text-align: center;
+      padding: 4rem 1rem;
     }
-    .footer {
-      margin-top: auto;
+    .mensaje-inicial i {
+      font-size: 4rem;
+      color: #DC2626;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    .mensaje-inicial h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #F5F5F5;
+    }
+    .mensaje-inicial p {
+      color: #9CA3AF;
+      max-width: 400px;
+      margin: 0.5rem auto 0;
     }
   </style>
 </head>
@@ -160,12 +171,17 @@
 
     <!-- RESULTADOS -->
     <div id="resultsContainer">
-      <!-- Aquí se mostrarán las tarjetas de reservas o el mensaje de "sin reservas" -->
+      <!-- Mensaje inicial -->
+      <div class="mensaje-inicial" id="mensajeInicial">
+        <i class="fas fa-plane-departure"></i>
+        <h3>Busca tus reservas</h3>
+        <p>Ingresa tu DNI en el campo de arriba y podrás ver todas tus aventuras con Illariy Travel.</p>
+      </div>
     </div>
   </main>
 
-  <!-- FOOTER (siempre al final) -->
-  <footer class="footer bg-black border-t border-red-900/30 py-8 mt-16">
+  <!-- FOOTER -->
+  <footer class="bg-black border-t border-red-900/30 py-8 mt-16">
     <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
       <div class="text-xl font-extrabold"><span class="text-red-600">ILLARIY</span> <span class="text-white font-light">Travel</span></div>
       <div class="flex gap-6"><a href="#" class="hover:text-red-400">Política de privacidad</a><a href="#" class="hover:text-red-400">Términos y condiciones</a></div>
@@ -180,6 +196,7 @@
     const errorMsg = document.getElementById('errorMsg');
     const errorText = document.getElementById('errorText');
     const resultsContainer = document.getElementById('resultsContainer');
+    const mensajeInicial = document.getElementById('mensajeInicial');
 
     // ─── FUNCIONES AUXILIARES ──────────────────────────────────────────
     function mostrarError(texto) {
@@ -208,23 +225,49 @@
       return fechaStr;
     }
 
-    function estadoClase(estado) {
-      const map = {
-        'Pagado': 'badge-registrado',
-        'Confirmada': 'badge-registrado',
-        'Registrado': 'badge-registrado',
-        'Pendiente': 'badge-pendiente',
-        'Cancelado': 'badge-cancelado',
-        'Cancelada': 'badge-cancelado',
-        'Finalizado': 'badge-finalizado',
-        'Finalizada': 'badge-finalizado'
-      };
-      return map[estado] || 'badge-pendiente';
+    // Convertir fecha "DD/MM/YYYY" a objeto Date
+    function parseFecha(fechaStr) {
+      if (!fechaStr) return null;
+      // Si tiene hora, separar
+      const partes = fechaStr.split(' ');
+      const fecha = partes[0]; // DD/MM/YYYY
+      if (fecha.includes('/')) {
+        const [d, m, y] = fecha.split('/');
+        return new Date(`${y}-${m}-${d}`);
+      }
+      // Si es ISO
+      const iso = fechaStr.split('T');
+      if (iso.length === 2) {
+        return new Date(iso[0]);
+      }
+      return new Date(fechaStr);
     }
 
-    function estadoTexto(estado) {
-      if (estado === 'Pagado' || estado === 'Confirmada') return 'Registrado';
-      return estado || 'Pendiente';
+    function esFechaPasada(fechaStr) {
+      const fecha = parseFecha(fechaStr);
+      if (!fecha) return false;
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      return fecha < hoy;
+    }
+
+    function estadoClaseYTexto(reserva, paquete) {
+      // Primero ver si el paquete tiene fecha de inicio
+      let fechaInicio = paquete?.fecha_Inicio || paquete?.Fecha_Inicio || null;
+      if (fechaInicio) {
+        const esPasado = esFechaPasada(fechaInicio);
+        if (esPasado) {
+          return { clase: 'badge-finalizado', texto: 'Finalizado' };
+        } else {
+          return { clase: 'badge-proximo', texto: 'Próximo' };
+        }
+      }
+      // Fallback: usar estado original
+      const estadoOriginal = reserva.estatus || reserva.Estatus || 'Pendiente';
+      if (estadoOriginal === 'Pagado' || estadoOriginal === 'Confirmada') {
+        return { clase: 'badge-registrado', texto: 'Registrado' };
+      }
+      return { clase: 'badge-pendiente', texto: estadoOriginal };
     }
 
     // ─── BUSCAR CLIENTE POR DNI ──────────────────────────────────────
@@ -278,6 +321,9 @@
 
     // ─── RENDERIZAR RESERVAS ──────────────────────────────────────────
     async function renderReservas(reservas, cliente) {
+      // Ocultar mensaje inicial
+      if (mensajeInicial) mensajeInicial.style.display = 'none';
+
       if (!reservas || reservas.length === 0) {
         resultsContainer.innerHTML = `
           <div class="text-center py-16">
@@ -298,7 +344,13 @@
         <div class="grid gap-6">
       `;
 
-      reservas.sort((a, b) => new Date(b.fecha_Reserva || b.Fecha_Reserva) - new Date(a.fecha_Reserva || a.Fecha_Reserva));
+      // Ordenar por fecha de inicio (más reciente primero)
+      reservas.sort((a, b) => {
+        const idPaqA = a.iD_Paquete || a.ID_Paquete;
+        const idPaqB = b.iD_Paquete || b.ID_Paquete;
+        // No podemos obtener fechas de inicio aquí de forma síncrona, así que usamos fecha de reserva
+        return new Date(b.fecha_Reserva || b.Fecha_Reserva) - new Date(a.fecha_Reserva || a.Fecha_Reserva);
+      });
 
       for (const reserva of reservas) {
         const idPaq = reserva.iD_Paquete || reserva.ID_Paquete;
@@ -309,10 +361,11 @@
         const nombrePaq = paquete ? paquete.nombre : 'Paquete no disponible';
         const precioTotal = reserva.precio_Total || reserva.Precio_Total || 0;
         const fechaReserva = formatearFecha(reserva.fecha_Reserva || reserva.Fecha_Reserva);
-        const estado = estadoTexto(reserva.estatus || reserva.Estatus || 'Pendiente');
-        const badgeClass = estadoClase(reserva.estatus || reserva.Estatus || 'Pendiente');
         const personas = reserva.numero_Personas || reserva.Numero_Personas || 0;
         const acompanantes = personas > 0 ? personas - 1 : 0;
+
+        // Obtener estado según fecha de inicio
+        const { clase, texto } = estadoClaseYTexto(reserva, paquete);
 
         const fechaInicio = paquete ? formatearFecha(paquete.fecha_Inicio || paquete.Fecha_Inicio) : '—';
         const fechaFin = paquete ? formatearFecha(paquete.fecha_Fin || paquete.Fecha_Fin) : '—';
@@ -337,8 +390,7 @@
                 </div>
               </div>
               <div class="flex items-center gap-4">
-                <span class="badge-estado ${badgeClass}">${estado}</span>
-                <!-- ID eliminado -->
+                <span class="badge-estado ${clase}">${texto}</span>
               </div>
             </div>
 
@@ -398,6 +450,7 @@
         return;
       }
 
+      // Mostrar indicador de carga
       resultsContainer.innerHTML = `
         <div class="text-center py-12">
           <div class="spinner-border text-red-500" style="width:3rem;height:3rem;" role="status">
@@ -411,7 +464,10 @@
         const cliente = await buscarClientePorDNI(dni);
         if (!cliente) {
           resultsContainer.innerHTML = '';
+          // Restaurar mensaje inicial? mejor mostrar error
           mostrarError('No se encontró un cliente con ese DNI. ¿Ya te has registrado?');
+          // Volver a mostrar mensaje inicial si se quiere
+          if (mensajeInicial) mensajeInicial.style.display = 'block';
           return;
         }
 
@@ -423,6 +479,7 @@
         resultsContainer.innerHTML = '';
         mostrarError('Ocurrió un error al consultar tus reservas. Intenta nuevamente más tarde.');
         console.error(err);
+        if (mensajeInicial) mensajeInicial.style.display = 'block';
       }
     });
 
