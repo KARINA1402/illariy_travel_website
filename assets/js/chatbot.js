@@ -39,11 +39,11 @@ function cargarEstado() {
                     agregarMensajeDOM(msg.texto, msg.tipo, false);
                 });
             }, 100);
-        } catch(e) { console.warn('Error cargando mensajes', e); }
+        } catch (e) { console.warn('Error cargando mensajes', e); }
     }
     const historialGuardado = localStorage.getItem('chat_historial');
     if (historialGuardado) {
-        try { historial = JSON.parse(historialGuardado); } catch(e) {}
+        try { historial = JSON.parse(historialGuardado); } catch (e) { }
     }
     const chatAbierto = localStorage.getItem('chat_abierto') === 'true';
     return chatAbierto;
@@ -70,7 +70,7 @@ function agregarMensaje(html, tipo = 'user') {
 // ==================== CREAR WIDGET CHAT ====================
 function crearWidgetChat() {
     if (document.getElementById('chatbot-flotante')) return;
-    
+
     const chatHTML = `
         <div id="chatbot-flotante">
             <div id="chatbot-toggle" class="chatbot-toggle">
@@ -334,7 +334,7 @@ function crearWidgetChat() {
     const toggleBtn = document.getElementById('chatbot-toggle');
     const closeBtn = document.getElementById('chatbot-close');
     const windowChat = document.getElementById('chatbot-window');
-    
+
     function setChatState(open) {
         if (open) {
             windowChat.classList.add('open');
@@ -343,7 +343,7 @@ function crearWidgetChat() {
         }
         guardarEstadoChat(open);
     }
-    
+
     function toggleChat() {
         const isOpen = windowChat.classList.contains('open');
         setChatState(!isOpen);
@@ -351,10 +351,10 @@ function crearWidgetChat() {
             document.getElementById('chatbot-input').focus();
         }
     }
-    
+
     toggleBtn.onclick = toggleChat;
     closeBtn.onclick = () => setChatState(false);
-    
+
     // Sugerencias
     document.querySelectorAll('.suggestion-btn').forEach(btn => {
         btn.onclick = () => {
@@ -374,12 +374,12 @@ function crearWidgetChat() {
             }
         };
     });
-    
+
     document.getElementById('chatbot-send').onclick = () => enviarMensaje();
     document.getElementById('chatbot-input').onkeypress = (e) => {
         if (e.key === 'Enter') enviarMensaje();
     };
-    
+
     cargarPaquetes().then(() => {
         const chatAbierto = cargarEstado();
         setChatState(chatAbierto);
@@ -395,7 +395,7 @@ async function cargarPaquetes() {
         const res = await fetch(API_PAQUETES);
         if (res.ok) paquetes = await res.json();
         else console.warn('API paquetes no disponible');
-    } catch(e) { console.error('Error cargando paquetes:', e); }
+    } catch (e) { console.error('Error cargando paquetes:', e); }
 }
 
 function mostrarTyping() {
@@ -450,14 +450,14 @@ async function enviarMensaje() {
     let texto = input.value.trim();
     if (!texto) return;
     input.value = '';
-    
+
     agregarMensaje(escapeHtml(texto), 'user');
     historial.push({ role: 'user', content: texto });
     if (historial.length > 12) historial.shift();
-    
+
     const typingDiv = mostrarTyping();
     await delayNatural();
-    
+
     const nuevoNombre = detectarNombre(texto);
     if (nuevoNombre) {
         nombreUsuario = nuevoNombre.charAt(0).toUpperCase() + nuevoNombre.slice(1);
@@ -467,7 +467,7 @@ async function enviarMensaje() {
         guardarEstado();
         return;
     }
-    
+
     if (!nombreUsuario && primerMensaje) {
         if (texto.length < 20 && !texto.includes('?')) {
             nombreUsuario = texto.charAt(0).toUpperCase() + texto.slice(1);
@@ -482,7 +482,7 @@ async function enviarMensaje() {
             guardarEstado();
         }
     }
-    
+
     const textoLower = texto.toLowerCase();
     if (textoLower.includes('pagar') || textoLower.includes('pago') || textoLower.includes('coste') || textoLower.includes('precio final')) {
         quitarTyping();
@@ -502,7 +502,7 @@ async function enviarMensaje() {
         guardarEstado();
         return;
     }
-    
+
     try {
         const respuesta = await consultarGroq(texto);
         quitarTyping();
@@ -526,6 +526,8 @@ async function enviarMensaje() {
 
 async function consultarGroq(pregunta) {
     try {
+        console.log('📤 Enviando pregunta:', pregunta);
+
         const response = await fetch('https://illary.bsite.net/api/Chat/consultar', {
             method: 'POST',
             headers: {
@@ -539,21 +541,33 @@ async function consultarGroq(pregunta) {
             })
         });
 
+        console.log('📥 Respuesta HTTP:', response.status, response.statusText);
+        console.log('📋 Headers:', response.headers);
+
         if (!response.ok) {
             const errorData = await response.json();
+            console.error('❌ Error del servidor:', errorData);
             throw new Error(errorData.error || `HTTP ${response.status}`);
         }
 
         const data = await response.json();
-        return data.respuesta;
+        console.log('Respuesta del backend:', data);
+        console.log('✅ Datos recibidos:', data);
+        console.log('💬 Respuesta del bot:', data.respuesta);
+
+        if (data.respuesta) {
+            return data.respuesta;
+        } else {
+            throw new Error('Respuesta sin contenido');
+        }
     } catch (error) {
-        console.error('Error al consultar el chat:', error);
+        console.error('🔥 Error en consultarGroq:', error);
         throw error;
     }
 }
 
 function escapeHtml(str) {
-    return str.replace(/[&<>]/g, function(m) {
+    return str.replace(/[&<>]/g, function (m) {
         if (m === '&') return '&amp;';
         if (m === '<') return '&lt;';
         if (m === '>') return '&gt;';
