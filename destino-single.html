@@ -1461,8 +1461,88 @@
       spn.classList.toggle('hidden', !loading);
     }
 
+    /**
+ * Verifica si el cliente tiene reservas duplicadas o con cruce de fechas.
+ * @param {number} idCliente - ID del cliente (debe estar ya existente en BD)
+ * @param {number} idPaquete - ID del paquete a reservar
+ * @param {Date} fechaInicio - Fecha de inicio del nuevo paquete
+ * @param {Date} fechaFin - Fecha de fin del nuevo paquete
+ * @returns {Promise<{conflict: boolean, tipo: string, mensaje: string}>}
+ */
+    async function verificarConflictosReserva(idCliente, idPaquete, fechaInicio, fechaFin) {
+      // Si no hay ID de cliente, no se puede validar (pero debería ocurrir solo si es nuevo)
+      if (!idCliente) return { conflict: false, tipo: null, mensaje: '' };
+
+      // 1. Obtener reservas del cliente
+      const resReservas = await fetch(`${API}/Reserva/cliente/${idCliente}`);
+      let reservas = [];
+      if (resReservas.ok) {
+        reservas = await resReservas.json();
+      } else {
+        // Fallback: obtener todas y filtrar
+        const resAll = await fetch(`${API}/Reserva`);
+        if (!resAll.ok) throw new Error('No se pudieron obtener las reservas.');
+        const todas = await resAll.json();
+        reservas = todas.filter(r => (r.iD_Cliente || r.ID_Cliente) === idCliente);
+      }
+
+      if (reservas.length === 0) return { conflict: false, tipo: null, mensaje: '' };
+
+      // 2. Obtener catálogo de paquetes (para saber fechas de cada reserva)
+      const resPaquetes = await fetch(`${API}/Paquete`);
+      if (!resPaquetes.ok) throw new Error('No se pudo obtener la lista de paquetes.');
+      const paquetes = await resPaquetes.json();
+
+      // 3. Recorrer reservas y comparar
+      for (const reserva of reservas) {
+        const idPaqReserva = reserva.iD_Paquete || reserva.ID_Paquete;
+        const paqueteReserva = paquetes.find(p => (p.iD_Paquete || p.ID_Paquete) === idPaqReserva);
+        if (!paqueteReserva) continue;
+
+        const fechaInicioExistente = parseFecha(paqueteReserva.fecha_Inicio || paqueteReserva.Fecha_Inicio);
+        const fechaFinExistente = parseFecha(paqueteReserva.fecha_Fin || paqueteReserva.Fecha_Fin);
+        if (!fechaInicioExistente || !fechaFinExistente) continue;
+
+        // Duplicado exacto
+        if (esDuplicado(idPaquete, fechaInicio, fechaFin, idPaqReserva, fechaInicioExistente, fechaFinExistente)) {
+          return {
+            conflict: true,
+            tipo: 'duplicado',
+            mensaje: `Ya tienes una reserva exacta para "${paqueteReserva.nombre}" con las mismas fechas.`
+          };
+        }
+
+        // Cruce de fechas (con margen)
+        if (fechasSeCruzan(fechaInicio, fechaFin, fechaInicioExistente, fechaFinExistente)) {
+          return {
+            conflict: true,
+            tipo: 'cruce',
+            mensaje: `Este paquete tiene cruze de fecha con tu reserva "${paqueteReserva.nombre}" (${paqueteReserva.fecha_Inicio} - ${paqueteReserva.fecha_Fin}). Por favor, elige otro paquete o ajusta las fechas.`
+          };
+        }
+      }
+
+      return { conflict: false, tipo: null, mensaje: '' };
+    }
+
     /* ═══════════════════════════ PROCESAR PAGO ═════════════════════════════════ */
     async function procesarPago() {
+
+      // Obtener o crear cliente
+      const idCliente = await obtenerOCrearCliente(titular);
+      if (!idCliente) throw new Error('No se pudo obtener el ID del cliente.');
+
+
+      const fechaInicio = parseFecha(paquete.fecha_Inicio);
+      const fechaFin = parseFecha(paquete.fecha_Fin);
+      if (fechaInicio && fechaFin) {
+        const resultado = await verificarConflictosReserva(idCliente, idPaquete, fechaInicio, fechaFin);
+        if (resultado.conflict) {
+          alert(`❌ ${resultado.mensaje}`);
+          setBtnLoading(false);
+          return;
+        }
+      }
 
       // ============================================
       // 1. VALIDAR TARJETA
