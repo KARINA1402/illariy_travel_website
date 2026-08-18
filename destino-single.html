@@ -440,52 +440,47 @@
       display: none;
     }
 
-    /* =========================================================
-   ILLARIY TRAVEL — BOLETA
-========================================================= */
-
+    /* ── COMPROBANTE ELECTRÓNICO (80mm) ── */
     .ill-boleta {
-      width: 100%;
-      max-width: 850px;
-      margin: 30px auto;
+      width: 80mm;
+      margin: 0 auto;
       background: #ffffff;
       color: #171717;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 25px 70px rgba(0, 0, 0, .30);
       font-family: 'Inter', Arial, sans-serif;
+      font-size: 10px;
+      line-height: 1.4;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: hidden;
     }
-
-
-    /* HEADER */
 
     .ill-header {
       background: #0A0A0A;
-      padding: 28px 34px;
+      padding: 12px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 25px;
+      gap: 10px;
     }
 
     .ill-brand {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 8px;
     }
 
     .ill-logo {
-      width: 68px;
-      height: 68px;
+      width: 36px;
+      height: 36px;
       object-fit: contain;
     }
 
     .ill-brand-name {
       font-family: 'Montserrat', sans-serif;
-      font-size: 27px;
+      font-size: 16px;
       font-weight: 900;
       color: #ffffff;
-      letter-spacing: -1px;
+      letter-spacing: -0.5px;
     }
 
     .ill-brand-name span {
@@ -494,8 +489,8 @@
 
     .ill-brand-subtitle {
       color: #a3a3a3;
-      font-size: 11px;
-      margin-top: 3px;
+      font-size: 7px;
+      margin-top: 1px;
     }
 
     .ill-header-right {
@@ -504,129 +499,117 @@
 
     .ill-status {
       color: #f87171;
-      font-size: 11px;
+      font-size: 7px;
       font-weight: 800;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
     }
 
     .ill-status-dot {
       display: inline-block;
-      width: 7px;
-      height: 7px;
+      width: 5px;
+      height: 5px;
       background: #22c55e;
       border-radius: 50%;
-      margin-right: 5px;
+      margin-right: 4px;
     }
 
     .ill-reserva-number {
       color: #ffffff;
       font-family: 'Montserrat', sans-serif;
       font-weight: 800;
-      font-size: 19px;
-      margin-top: 7px;
+      font-size: 12px;
+      margin-top: 4px;
     }
-
-
-    /* RED BAR */
 
     .ill-red-bar {
       background: #B91C1C;
       color: #ffffff;
-      padding: 12px 34px;
+      padding: 6px 14px;
       display: flex;
       justify-content: space-between;
-      font-size: 11px;
+      font-size: 7px;
       font-weight: 800;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
     }
 
-
-    /* SECTIONS */
-
     .ill-section {
-      padding: 28px 34px;
+      padding: 10px 14px;
     }
 
     .ill-section-title {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
       font-family: 'Montserrat', sans-serif;
-      font-size: 13px;
+      font-size: 9px;
       font-weight: 900;
-      letter-spacing: .7px;
+      letter-spacing: 0.5px;
       color: #171717;
       border-bottom: 1px solid #e5e5e5;
-      padding-bottom: 12px;
-      margin-bottom: 18px;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
     }
 
     .ill-section-number {
       color: #B91C1C;
-      font-size: 11px;
+      font-size: 8px;
     }
 
     .ill-section-count {
       margin-left: auto;
       background: #fee2e2;
       color: #991b1b;
-      padding: 5px 10px;
+      padding: 2px 6px;
       border-radius: 999px;
-      font-size: 10px;
+      font-size: 7px;
     }
-
-
-    /* CLIENT */
 
     .ill-client-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
     }
 
     .ill-data-card {
       background: #f7f7f7;
-      border-left: 3px solid #B91C1C;
-      padding: 13px 15px;
-      border-radius: 5px;
+      border-left: 2px solid #B91C1C;
+      padding: 6px 8px;
+      border-radius: 3px;
     }
 
     .ill-label {
       display: block;
       color: #737373;
-      font-size: 9px;
+      font-size: 6px;
       font-weight: 800;
-      letter-spacing: .8px;
-      margin-bottom: 5px;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
     }
 
     .ill-data-card strong {
-      font-size: 13px;
+      font-size: 10px;
       color: #171717;
     }
-
-
-    /* PASAJEROS */
 
     .ill-pasajero {
       display: flex;
       align-items: center;
-      gap: 13px;
-      padding: 13px 0;
-      border-bottom: 1px solid #eeeeee;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
     }
 
     .ill-pasajero-num {
-      width: 34px;
-      height: 34px;
+      width: 24px;
+      height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #111111;
-      color: #ffffff;
+      background: #111;
+      color: #fff;
       border-radius: 50%;
       font-family: 'Montserrat', sans-serif;
-      font-size: 10px;
+      font-size: 8px;
       font-weight: 800;
     }
 
@@ -635,23 +618,23 @@
     }
 
     .ill-pasajero-nombre {
-      font-size: 13px;
+      font-size: 10px;
       font-weight: 800;
     }
 
     .ill-pasajero-datos {
       display: flex;
       flex-wrap: wrap;
-      gap: 15px;
+      gap: 8px;
       color: #737373;
-      font-size: 10px;
-      margin-top: 4px;
+      font-size: 7px;
+      margin-top: 2px;
     }
 
     .ill-pasajero-tipo {
-      font-size: 9px;
+      font-size: 7px;
       font-weight: 900;
-      padding: 5px 9px;
+      padding: 3px 6px;
       border-radius: 999px;
     }
 
@@ -665,41 +648,38 @@
       color: #525252;
     }
 
-
-    /* EXPERIENCE */
-
     .ill-experience {
-      margin: 0 34px 28px;
-      padding: 25px;
+      margin: 0 14px 14px;
+      padding: 14px;
       background: #0A0A0A;
-      border-radius: 14px;
-      color: #ffffff;
+      border-radius: 8px;
+      color: #fff;
     }
 
     .ill-experience-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 20px;
+      gap: 10px;
     }
 
     .ill-experience-label {
       color: #f87171;
-      font-size: 9px;
+      font-size: 7px;
       font-weight: 900;
-      letter-spacing: 1.5px;
+      letter-spacing: 0.5px;
     }
 
     .ill-experience h2 {
-      margin: 6px 0 0;
+      margin: 4px 0 0;
       font-family: 'Montserrat', sans-serif;
-      font-size: 24px;
+      font-size: 16px;
       line-height: 1.2;
     }
 
     .ill-experience-icon {
-      width: 48px;
-      height: 48px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: #B91C1C;
       display: flex;
@@ -710,60 +690,54 @@
 
     .ill-experience-details {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      margin-top: 25px;
-      padding-top: 20px;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 12px;
       border-top: 1px solid #333;
-      gap: 15px;
     }
 
     .ill-experience-details span,
     .ill-payment-grid span {
       display: block;
       color: #a3a3a3;
-      font-size: 8px;
+      font-size: 6px;
       font-weight: 800;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
     }
 
     .ill-experience-details strong {
-      font-size: 11px;
+      font-size: 10px;
     }
-
-
-    /* PAYMENT */
 
     .ill-payment-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr 1fr;
       gap: 1px;
       background: #e5e5e5;
     }
 
     .ill-payment-grid>div {
       background: #fafafa;
-      padding: 16px;
+      padding: 10px 12px;
     }
 
     .ill-payment-grid strong {
-      font-size: 12px;
+      font-size: 10px;
     }
 
     .ill-payment-grid i {
       color: #B91C1C;
-      margin-right: 5px;
+      margin-right: 4px;
     }
 
-
-    /* TOTAL */
-
     .ill-total {
-      margin: 0 34px 28px;
+      margin: 0 14px 14px;
       background: #B91C1C;
-      color: #ffffff;
-      padding: 22px 25px;
-      border-radius: 12px;
+      color: #fff;
+      padding: 14px 16px;
+      border-radius: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -774,136 +748,113 @@
       display: block;
       font-family: 'Montserrat', sans-serif;
       font-weight: 900;
-      font-size: 14px;
+      font-size: 12px;
     }
 
     .ill-total small {
       display: block;
-      margin-top: 5px;
-      font-size: 10px;
-      opacity: .8;
+      margin-top: 3px;
+      font-size: 8px;
+      opacity: 0.8;
     }
 
     .ill-total-price {
       font-family: 'Montserrat', sans-serif;
-      font-size: 28px;
+      font-size: 20px;
       font-weight: 900;
       text-align: right;
     }
 
     .ill-total-price small {
       display: inline;
-      font-size: 9px;
-      margin-right: 5px;
+      font-size: 7px;
+      margin-right: 3px;
     }
 
-
-    /* CONTACT */
-
     .ill-contact {
-      margin: 0 34px 28px;
+      margin: 0 14px 14px;
       display: flex;
-      gap: 18px;
+      gap: 12px;
       align-items: center;
-      padding: 18px;
+      padding: 12px;
       background: #f5f5f5;
-      border-radius: 12px;
+      border-radius: 8px;
     }
 
     .ill-contact-logo img {
-      width: 48px;
-      height: 48px;
+      width: 32px;
+      height: 32px;
       object-fit: contain;
     }
 
     .ill-contact strong {
-      font-size: 12px;
+      font-size: 10px;
     }
 
     .ill-contact p {
       color: #737373;
-      font-size: 10px;
-      margin: 4px 0 8px;
+      font-size: 7px;
+      margin: 2px 0 4px;
     }
 
     .ill-contact-data {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      font-size: 9px;
+      gap: 6px;
+      font-size: 7px;
       color: #525252;
     }
 
     .ill-contact-data i {
       color: #B91C1C;
-      margin-right: 3px;
+      margin-right: 2px;
     }
-
-
-    /* FOOTER */
 
     .ill-footer {
       background: #0A0A0A;
-      padding: 18px 25px;
+      padding: 10px 14px;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
+      text-align: center;
+      gap: 4px;
       color: #737373;
-      font-size: 9px;
+      font-size: 7px;
     }
 
     .ill-footer strong {
       color: #ffffff;
       font-family: 'Montserrat', sans-serif;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
     }
 
-    @media (max-width: 650px) {
-
-      .ill-header {
-        flex-direction: column;
-        align-items: flex-start;
+    @media print {
+      body * {
+        visibility: hidden;
       }
 
-      .ill-header-right {
-        text-align: left;
+      #boleta-wrapper,
+      #boleta-wrapper * {
+        visibility: visible;
       }
 
-      .ill-red-bar {
-        flex-direction: column;
-        gap: 5px;
+      #boleta-wrapper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80mm;
+        padding: 0;
+        margin: 0;
+        background: white;
       }
 
-      .ill-client-grid,
-      .ill-payment-grid,
-      .ill-experience-details {
-        grid-template-columns: 1fr;
+      .no-print {
+        display: none !important;
       }
 
-      .ill-section,
-      .ill-experience,
-      .ill-total,
-      .ill-contact {
-        margin-left: 15px;
-        margin-right: 15px;
-      }
-
-      .ill-section {
-        padding: 22px 15px;
-      }
-
-      .ill-experience {
-        padding: 20px;
-      }
-
-      .ill-total {
-        padding: 20px;
-      }
-
-      .ill-total-price {
-        font-size: 21px;
+      @page {
+        size: 80mm auto;
+        margin: 0;
       }
     }
   </style>
@@ -1876,13 +1827,14 @@
           response.idReserva;
 
         if (!idReserva) {
-
-          console.warn(
-            'El backend no devolvió id_Reserva.',
-            response
-          );
-
+          console.warn('El backend no devolvió id_Reserva.', response);
         }
+
+        const numeroTransaccionBackend =
+          response.numeroTransaccion ||
+          response.Numero_Transaccion ||
+          response.transaccion ||
+          numeroTransaccion;
 
         // ============================================
         // 15. CERRAR MODAL
@@ -2275,384 +2227,132 @@
     }
 
     /* ═══════════════════════════ BOLETA MEJORADA (COMPROBANTE) ═════════════════ */
-    function mostrarBoleta(
-      idReserva,
-      total,
-      titular,
-      numTransaccion,
-      fechaReservaStr
-    ) {
+    function mostrarBoleta(idReserva, total, titular, numTransaccion, fechaReservaStr) {
+      const checkout = document.getElementById('checkout-wrapper');
+      if (checkout) checkout.style.display = 'none';
 
-      const checkout =
-        document.getElementById('checkout-wrapper');
+      const precioUnit = Number(paquete?.precio_Base || 0);
+      const fechaEmision = fechaReservaStr || formatearFechaReserva();
+      // Usamos el número de transacción real (puede venir del backend)
+      const nroTransaccion = numTransaccion || `ILL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      // Para el código de reserva usamos el mismo número de transacción
+      const codigoReserva = nroTransaccion;
 
-      if (checkout) {
-        checkout.style.display = 'none';
-      }
-
-      const precioUnit =
-        Number(paquete?.precio_Base || 0);
-
-      const fechaEmision =
-        fechaReservaStr ||
-        formatearFechaReserva(new Date());
-
-      const nroReserva =
-        `ILL-${String(idReserva).padStart(6, '0')}`;
-
-      // =====================================================
-      // PASAJEROS
-      // =====================================================
-
+      // Construir HTML de pasajeros (igual que antes)
       let pasajerosHtml = '';
-
       for (let i = 0; i < numeroPax; i++) {
-
-        const p =
-          getDatosPasajero(i);
-
-        const esTitular =
-          i === 0;
-
+        const p = getDatosPasajero(i);
+        const esTitular = i === 0;
         pasajerosHtml += `
       <div class="ill-pasajero">
-
-        <div class="ill-pasajero-num">
-          ${String(i + 1).padStart(2, '0')}
-        </div>
+        <div class="ill-pasajero-num">${String(i + 1).padStart(2, '0')}</div>
         <div class="ill-pasajero-info">
-          <div class="ill-pasajero-nombre">
-            ${p.nombre || ''} ${p.apellido || ''}
-          </div>
+          <div class="ill-pasajero-nombre">${p.nombre || ''} ${p.apellido || ''}</div>
           <div class="ill-pasajero-datos">
-            <span>
-              <strong>Documento:</strong>
-              ${p.pasaporte || '-'}
-            </span>
-            <span>
-              <strong>Nacionalidad:</strong>
-              ${p.nacionalidad || '-'}
-            </span>
+            <span><strong>Doc:</strong> ${p.pasaporte || '-'}</span>
+            <span><strong>Nac:</strong> ${p.nacionalidad || '-'}</span>
           </div>
         </div>
-        <div class="ill-pasajero-tipo ${esTitular
-            ? 'titular'
-            : 'acompanante'
-          }">
-          ${esTitular ? 'TITULAR' : 'VIAJERO'}
-        </div>
+        <div class="ill-pasajero-tipo ${esTitular ? 'titular' : 'acompanante'}">${esTitular ? 'TITULAR' : 'VIAJERO'}</div>
       </div>
     `;
       }
 
-      // =====================================================
-      // HTML
-      // =====================================================
-
       const html = `
-
     <div class="ill-boleta">
-      <!-- ==========================================
-           CABECERA
-      =========================================== -->
+      <!-- HEADER -->
       <div class="ill-header">
         <div class="ill-brand">
-          <img
-            src="https://illariy-travel.vercel.app/assets/img/logo.png"
-            alt="Illariy Travel"
-            class="ill-logo"
-          >
+          <img src="https://illariy-travel.vercel.app/assets/img/logo.png" alt="Illariy Travel" class="ill-logo">
           <div>
-            <div class="ill-brand-name">
-              ILLARIY
-              <span>TRAVEL</span>
-            </div>
-            <div class="ill-brand-subtitle">
-              Aventura y naturaleza en Perú
-            </div>
+            <div class="ill-brand-name">ILLARIY <span>TRAVEL</span></div>
+            <div class="ill-brand-subtitle">Aventura y naturaleza en Perú</div>
           </div>
         </div>
         <div class="ill-header-right">
-          <div class="ill-status">
-            <span class="ill-status-dot"></span>
-            RESERVA CONFIRMADA
-          </div>
-          <div class="ill-reserva-number">
-            ${nroReserva}
-          </div>
+          <div class="ill-status"><span class="ill-status-dot"></span> RESERVA CONFIRMADA</div>
+          <div class="ill-reserva-number">${codigoReserva}</div>
         </div>
       </div>
-      <!-- ==========================================
-           BARRA ROJA
-      =========================================== -->
+      <!-- BARRA ROJA -->
       <div class="ill-red-bar">
-        <span>
-          EXPERIENCIA RESERVADA
-        </span>
-        <span>
-          ${fechaEmision}
-        </span>
+        <span>COMPROBANTE ELECTRÓNICO</span>
+        <span>${fechaEmision}</span>
       </div>
-      <!-- ==========================================
-           DATOS DEL CLIENTE
-      =========================================== -->
+      <!-- TITULAR -->
       <div class="ill-section">
-        <div class="ill-section-title">
-          <span class="ill-section-number">
-            01
-          </span>
-          <span>
-            DATOS DEL TITULAR
-          </span>
-        </div>
+        <div class="ill-section-title"><span class="ill-section-number">01</span> DATOS DEL TITULAR</div>
         <div class="ill-client-grid">
-          <div class="ill-data-card">
-            <span class="ill-label">
-              NOMBRE COMPLETO
-            </span>
-            <strong>
-              ${titular.nombre || ''}
-              ${titular.apellido || ''}
-            </strong>
-          </div>
-          <div class="ill-data-card">
-            <span class="ill-label">
-              DOCUMENTO
-            </span>
-            <strong>
-              ${titular.pasaporte || '-'}
-            </strong>
-          </div>
-          <div class="ill-data-card">
-            <span class="ill-label">
-              TELÉFONO
-            </span>
-            <strong>
-              ${titular.telefono || '-'}
-            </strong>
-          </div>
-          <div class="ill-data-card">
-            <span class="ill-label">
-              CORREO ELECTRÓNICO
-            </span>
-            <strong>
-              ${titular.correo || '-'}
-            </strong>
-          </div>
+          <div class="ill-data-card"><span class="ill-label">NOMBRE COMPLETO</span><strong>${titular.nombre || ''} ${titular.apellido || ''}</strong></div>
+          <div class="ill-data-card"><span class="ill-label">DOCUMENTO</span><strong>${titular.pasaporte || '-'}</strong></div>
+          <div class="ill-data-card"><span class="ill-label">TELÉFONO</span><strong>${titular.telefono || '-'}</strong></div>
+          <div class="ill-data-card"><span class="ill-label">CORREO</span><strong>${titular.correo || '-'}</strong></div>
         </div>
       </div>
-      <!-- ==========================================
-           VIAJEROS
-      =========================================== -->
+      <!-- VIAJEROS -->
       <div class="ill-section">
-        <div class="ill-section-title">
-          <span class="ill-section-number">
-            02
-          </span>
-          <span>
-            VIAJEROS
-          </span>
-          <span class="ill-section-count">
-            ${numeroPax}
-            ${numeroPax === 1 ? 'PERSONA' : 'PERSONAS'}
-          </span>
-        </div>
-        <div class="ill-pasajeros">
-          ${pasajerosHtml}
-        </div>
+        <div class="ill-section-title"><span class="ill-section-number">02</span> VIAJEROS <span class="ill-section-count">${numeroPax} ${numeroPax === 1 ? 'PERSONA' : 'PERSONAS'}</span></div>
+        <div class="ill-pasajeros">${pasajerosHtml}</div>
       </div>
-      <!-- ==========================================
-           EXPERIENCIA
-      =========================================== -->
+      <!-- EXPERIENCIA -->
       <div class="ill-experience">
         <div class="ill-experience-top">
           <div>
-            <span class="ill-experience-label">
-              TU PRÓXIMA AVENTURA
-            </span>
-            <h2>
-              ${paquete?.nombre || 'Experiencia Illariy'}
-            </h2>
+            <span class="ill-experience-label">TU PRÓXIMA AVENTURA</span>
+            <h2>${paquete?.nombre || 'Experiencia Illariy'}</h2>
           </div>
-          <div class="ill-experience-icon">
-            <i class="fas fa-mountain"></i>
-          </div>
+          <div class="ill-experience-icon"><i class="fas fa-mountain"></i></div>
         </div>
         <div class="ill-experience-details">
-          <div>
-            <span>
-              DESTINO
-            </span>
-            <strong>
-              ${paquete?.destino ||
-        paquete?.nombre ||
-        'Por confirmar'
-        }
-            </strong>
-          </div>
-          <div>
-            <span>
-              FECHA DE INICIO
-            </span>
-
-            <strong>
-              ${paquete?.fecha_Inicio ||
-        'Por confirmar'
-        }
-            </strong>
-          </div>
-          <div>
-            <span>
-              FECHA DE FIN
-            </span>
-            <strong>
-              ${paquete?.fecha_Fin ||
-        'Por confirmar'
-        }
-            </strong>
-          </div>
-          <div>
-            <span>
-              VIAJEROS
-            </span>
-            <strong>
-              ${numeroPax}
-            </strong>
-          </div>
+          <div><span>DESTINO</span><strong>${paquete?.destino || paquete?.nombre || 'Por confirmar'}</strong></div>
+          <div><span>INICIO</span><strong>${paquete?.fecha_Inicio || 'Por confirmar'}</strong></div>
+          <div><span>FIN</span><strong>${paquete?.fecha_Fin || 'Por confirmar'}</strong></div>
+          <div><span>VIAJEROS</span><strong>${numeroPax}</strong></div>
         </div>
       </div>
-      <!-- ==========================================
-           PAGO
-      =========================================== -->
+      <!-- PAGO -->
       <div class="ill-section">
-        <div class="ill-section-title">
-          <span class="ill-section-number">
-            03
-          </span>
-          <span>
-            INFORMACIÓN DEL PAGO
-          </span>
-        </div>
+        <div class="ill-section-title"><span class="ill-section-number">03</span> INFORMACIÓN DEL PAGO</div>
         <div class="ill-payment-grid">
-          <div>
-            <span>
-              MÉTODO DE PAGO
-            </span>
-            <strong>
-              <i class="fas fa-credit-card"></i>
-              Tarjeta
-            </strong>
-          </div>
-          <div>
-            <span>
-              N.º DE OPERACIÓN
-            </span>
-            <strong>
-              ${numTransaccion}
-            </strong>
-          </div>
-          <div>
-            <span>
-              N.º DE RESERVA
-            </span>
-            <strong>
-              ${nroReserva}
-            </strong>
-          </div>
-          <div>
-            <span>
-              FECHA
-            </span>
-            <strong>
-              ${fechaEmision}
-            </strong>
-          </div>
+          <div><span>MÉTODO</span><strong><i class="fas fa-credit-card"></i> Tarjeta</strong></div>
+          <div><span>N° OPERACIÓN</span><strong>${codigoReserva}</strong></div>
+          <div><span>FECHA</span><strong>${fechaEmision}</strong></div>
+          <div><span>MONEDA</span><strong>PEN</strong></div>
         </div>
       </div>
-      <!-- ==========================================
-           TOTAL
-      =========================================== -->
+      <!-- TOTAL -->
       <div class="ill-total">
         <div>
-          <span>
-            TOTAL PAGADO
-          </span>
-          <small>
-            ${numeroPax} ${numeroPax === 1
-          ? 'viajero'
-          : 'viajeros'
-        } × S/ ${precioUnit.toFixed(2)}
-          </small>
+          <span>TOTAL PAGADO</span>
+          <small>${numeroPax} ${numeroPax === 1 ? 'viajero' : 'viajeros'} × S/ ${precioUnit.toFixed(2)}</small>
         </div>
-        <div class="ill-total-price">
-          <small>
-            PEN
-          </small>
-          S/ ${Number(total).toFixed(2)}
-        </div>
+        <div class="ill-total-price"><small>PEN</small> S/ ${Number(total).toFixed(2)}</div>
       </div>
-      <!-- ==========================================
-           CONTACTO
-      =========================================== -->
+      <!-- CONTACTO -->
       <div class="ill-contact">
-        <div class="ill-contact-logo">
-          <img
-            src="https://illariy-travel.vercel.app/assets/img/logo.png"
-            alt="Illariy Travel"
-          >
-        </div>
+        <div class="ill-contact-logo"><img src="https://illariy-travel.vercel.app/assets/img/logo.png" alt="Illariy Travel"></div>
         <div>
-          <strong>
-            ¿Necesitas ayuda con tu viaje?
-          </strong>
-          <p>
-            Estamos para acompañarte antes,
-            durante y después de tu aventura.
-          </p>
+          <strong>¿Necesitas ayuda?</strong>
+          <p>Estamos para acompañarte en tu aventura.</p>
           <div class="ill-contact-data">
-            <span>
-              <i class="fas fa-phone"></i>
-              990 693 358
-            </span>
-            <span>
-              <i class="fas fa-phone"></i>
-              966 862 395
-            </span>
-            <span>
-              <i class="fas fa-envelope"></i>
-              reservas@illariytravel.com
-            </span>
+            <span><i class="fas fa-phone"></i> 990 693 358</span>
+            <span><i class="fas fa-phone"></i> 966 862 395</span>
+            <span><i class="fas fa-envelope"></i> reservas@illariytravel.com</span>
           </div>
         </div>
       </div>
-      <!-- ==========================================
-           FOOTER
-      =========================================== -->
+      <!-- FOOTER -->
       <div class="ill-footer">
-        <strong>
-          ILLARIY TRAVEL
-        </strong>
-        <span>
-          Agencia de Viajes y Turismo · Huancayo, Perú
-        </span>
-        <span>
-          © 2026 Illariy Peru Travel Group Huancayo
-        </span>
+        <strong>ILLARIY TRAVEL</strong>
+        <span>Agencia de Viajes y Turismo · Huancayo, Perú</span>
+        <span>© 2026 Illariy Peru Travel Group Huancayo</span>
       </div>
     </div>
   `;
-      document.getElementById(
-        'boleta-content'
-      ).innerHTML = html;
 
-      document.getElementById(
-        'boleta-wrapper'
-      ).style.display = 'block';
-
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      document.getElementById('boleta-content').innerHTML = html;
+      document.getElementById('boleta-wrapper').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
   </script>
