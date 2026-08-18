@@ -1641,6 +1641,8 @@
             fechaFin
           );
           if (resultado.conflict) {
+            cerrarModalPago();
+
             if (resultado.tipo === 'duplicado') {
               await Swal.fire({
                 icon: 'error',
