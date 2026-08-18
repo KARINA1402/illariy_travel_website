@@ -11,6 +11,8 @@
     rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- SweetAlert2 para modales bonitos -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     :root {
       --bg-dark: #0A0A0A;
@@ -1091,7 +1093,7 @@
           return {
             conflict: true,
             tipo: 'cruce',
-            mensaje: `Este paquete tiene cruce de fecha con tu reserva "${paqueteReserva.nombre}" (${paqueteReserva.fecha_Inicio} - ${paqueteReserva.fecha_Fin}). Por favor, elige otro paquete o ajusta las fechas.`
+            mensaje: `Este paquete se superpone con tu reserva "${paqueteReserva.nombre}" (${paqueteReserva.fecha_Inicio} - ${paqueteReserva.fecha_Fin}). Por favor, elige otro paquete o ajusta las fechas.`
           };
         }
       }
@@ -1467,7 +1469,12 @@
           if (!el || !el.value.trim()) {
             el.classList.add('error');
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            alert(`Pasajero ${i + 1}: el campo "${campo.label}" es obligatorio.`);
+            Swal.fire({
+              icon: 'warning',
+              title: 'Campo obligatorio',
+              text: `Pasajero ${i + 1}: el campo "${campo.label}" es obligatorio.`,
+              confirmButtonText: 'Aceptar'
+            });
             return false;
           } else el.classList.remove('error');
         }
@@ -1480,7 +1487,12 @@
             const msgEl = document.getElementById(`pax-${i}-edad-msg`);
             if (msgEl) { msgEl.textContent = isTitular ? 'El titular debe ser mayor de 18 años.' : `El pasajero ${i + 1} debe tener al menos 3 años.`; msgEl.style.display = 'block'; }
             fechaEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            alert(isTitular ? 'El titular debe ser mayor de 18 años.' : `El pasajero ${i + 1} debe tener al menos 3 años.`);
+            Swal.fire({
+              icon: 'error',
+              title: 'Edad no permitida',
+              text: isTitular ? 'El titular debe ser mayor de 18 años.' : `El pasajero ${i + 1} debe tener al menos 3 años.`,
+              confirmButtonText: 'Aceptar'
+            });
             return false;
           }
         }
@@ -1565,11 +1577,21 @@
     async function procesarPago() {
       const titular = getDatosPasajero(0);
       if (!titular) {
-        alert('No se pudieron obtener los datos del titular.');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Datos incompletos',
+          text: 'No se pudieron obtener los datos del titular.',
+          confirmButtonText: 'Aceptar'
+        });
         return;
       }
       if (!titular.correo || !titular.correo.trim()) {
-        alert('El correo electrónico del titular es obligatorio.');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Correo requerido',
+          text: 'El correo electrónico del titular es obligatorio.',
+          confirmButtonText: 'Aceptar'
+        });
         return;
       }
 
@@ -1619,7 +1641,21 @@
             fechaFin
           );
           if (resultado.conflict) {
-            alert(`❌ ${resultado.mensaje}`);
+            if (resultado.tipo === 'duplicado') {
+              await Swal.fire({
+                icon: 'error',
+                title: 'Reserva duplicada',
+                text: resultado.mensaje,
+                confirmButtonText: 'Aceptar'
+              });
+            } else {
+              await Swal.fire({
+                icon: 'error',
+                title: 'Conflicto de fechas',
+                text: resultado.mensaje,
+                confirmButtonText: 'Aceptar'
+              });
+            }
             setBtnLoading(false);
             return;
           }
@@ -1729,10 +1765,19 @@
         console.log('Correo destino:', correoTitular);
 
         if (correoEnviado) {
-          alert('✅ Reserva confirmada correctamente.\n\nEl comprobante ha sido enviado a:\n' + correoTitular);
+          await Swal.fire({
+            icon: 'success',
+            title: 'Reserva confirmada',
+            text: `El comprobante ha sido enviado a ${correoTitular}`,
+            confirmButtonText: 'Aceptar'
+          });
         } else {
-          alert('⚠️ Reserva creada correctamente, pero el backend no pudo enviar el correo.\n\nCorreo destino:\n' + correoTitular);
-          console.warn('La reserva fue creada pero correoEnviado=false.');
+          await Swal.fire({
+            icon: 'warning',
+            title: 'Reserva creada',
+            text: `La reserva se creó correctamente pero el correo no pudo enviarse a ${correoTitular}.`,
+            confirmButtonText: 'Aceptar'
+          });
         }
 
       } catch (error) {
@@ -1741,7 +1786,12 @@
           modalError.textContent = error?.message || 'Error inesperado al procesar el pago.';
           modalError.classList.remove('hidden');
         } else {
-          alert(error?.message || 'Error inesperado al procesar el pago.');
+          await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error?.message || 'Error inesperado al procesar el pago.',
+            confirmButtonText: 'Aceptar'
+          });
         }
       } finally {
         setBtnLoading(false);
