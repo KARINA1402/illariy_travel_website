@@ -515,7 +515,8 @@
           <div class="flex justify-between py-2 border-b border-zinc-800"><span>IGV (18%)</span><span id="sum-igv"
               class="mono"></span></div>
           <div class="flex justify-between text-red-500 text-xl font-black pt-3 mt-2 border-t-2 border-red-500">
-            <span>TOTAL</span><span id="sum-total" class="mono"></span></div>
+            <span>TOTAL</span><span id="sum-total" class="mono"></span>
+          </div>
           <button class="btn-pagar mt-6 flex items-center justify-center gap-2" onclick="abrirModalPago()"><i
               class="fas fa-lock"></i> Pagar ahora</button>
           <p class="text-center text-xs text-gray-500 mt-4"><i class="fas fa-shield-alt text-red-500"></i> Pago 100%
@@ -1049,108 +1050,165 @@
 
       try {
         const titular = getDatosPasajero(0);
-        const correo = titular.correo;
         const total = paquete.precio_Base * numeroPax;
-        let idCliente = null;
-
-        // Buscar cliente por DNI o correo
-        const dniTitular = titular.pasaporte;
-        if (dniClienteCache[dniTitular]?.id) {
-          idCliente = dniClienteCache[dniTitular].id;
-        } else if (clienteCache[correo]?.id) {
-          idCliente = clienteCache[correo].id;
-        } else {
-          try {
-            const resCheck = await fetch(`${API}/Cliente/email?correo=${encodeURIComponent(correo)}`);
-            if (resCheck.ok) {
-              const listaRes = await fetch(`${API}/Cliente`);
-              const lista = await listaRes.json();
-              const cli = lista.find(c => (c.correo || c.Correo).toLowerCase() === correo.toLowerCase());
-              if (cli) {
-                idCliente = cli.iD_Cliente;
-                clienteCache[correo] = { id: cli.iD_Cliente, data: cli };
-              }
-            }
-          } catch (e) { /* ignorar */ }
-
-          if (!idCliente) {
-            // Crear nuevo cliente
-            const nuevo = {
-              iD_Usuario: 1,
-              frecuencia_Viajero: 'Normal',
-              correo: correo,
-              nombre: titular.nombre,
-              apellido: titular.apellido,
-              telefono: titular.telefono,
-              direccion: titular.direccion,
-              nacionalidad: titular.nacionalidad,
-              pasaporte: titular.pasaporte,
-              fecha_Nacimiento: new Date(titular.fechaNac).toLocaleDateString('es-PE') // DD/MM/YYYY
-            };
-            const resPost = await fetch(`${API}/Cliente`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(nuevo)
-            });
-            if (!resPost.ok) throw new Error('Error al crear cliente');
-            const creado = await resPost.json();
-            idCliente = creado.iD_Cliente;
-            clienteCache[correo] = { id: idCliente, data: creado };
-            dniClienteCache[dniTitular] = { id: idCliente, data: creado };
-          }
-        }
-
-        // Crear reserva con fecha formateada
         const idPaquete = parseInt(new URLSearchParams(location.search).get('iD_Paquete'));
-        let obs = '';
+
+        // Obtener o crear el cliente
+        const idCliente = await obtenerOCrearCliente(titular);
+
+        // Construir acompañantes
+        const acompanantes = [];
         for (let i = 1; i < numeroPax; i++) {
           const p = getDatosPasajero(i);
-          obs += `Pax ${i + 1}: ${p.nombre} ${p.apellido} – Doc: ${p.pasaporte} – Nac: ${p.nacionalidad} | `;
+          acompanantes.push({
+            Nombre: p.nombre,
+            Apellido: p.apellido,
+            Pasaporte: p.pasaporte,
+            Nacionalidad: p.nacionalidad,
+            Telefono: '',
+            Correo: ''
+          });
         }
-        const fechaReservaFormateada = formatearFechaReserva(); // ← usa el formato pedido
-        const reservaBody = {
-          iD_Cliente: idCliente,
-          iD_Paquete: idPaquete,
-          fecha_Reserva: fechaReservaFormateada,
-          numero_Personas: numeroPax,
-          precio_Total: total,
-          estatus: 'Pagado',
-          observaciones: obs || 'Sin acompañantes'
-        };
-        const resReserva = await fetch(`${API}/Reserva`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(reservaBody)
-        });
-        if (!resReserva.ok) throw new Error('Error al crear reserva');
-        const reserva = await resReserva.json();
-        const idReserva = reserva.iD_Reserva;
 
-        // Registrar pago
-        const numTransaccion = `ILL-${Date.now()}`;
-        const pagoBody = {
-          iD_Reserva: idReserva,
-          fecha_Pago: new Date().toISOString(),
-          metodo_Pago: 'Tarjeta',
-          monto: total,
-          numero_Transaccion: numTransaccion
+        const payload = {
+          ID_Cliente: idCliente,
+          ID_Paquete: idPaquete,
+          Fecha_Reserva: formatearFechaReserva(),
+          Numero_Personas: numeroPax,
+          Precio_Total: total,
+          Observaciones: '',
+          Metodo_Pago: 'Tarjeta',
+          Monto: total,
+          Fecha_Pago: formatearFechaReserva(),
+          Numero_Transaccion: `ILL-${Date.now()}`,
+          Moneda: 'PEN',
+          DestinoNombre: paquete.destino || '',
+          Cliente: {
+            ID_Cliente: idCliente,
+            Nombre: titular.nombre,
+            Apellido: titular.apellido,
+            Telefono: titular.telefono,
+            Correo: titular.correo,
+            Pasaporte: titular.pasaporte,
+            Nacionalidad: titular.nacionalidad
+          },
+          Acompanantes: acompanantes,
+          Paquete: {
+            ID_Paquete: paquete.iD_Paquete,
+            Nombre: paquete.nombre,
+            Descripcion: paquete.descripcion || '',
+            Fecha_Inicio: paquete.fecha_Inicio || '',
+            Fecha_Fin: paquete.fecha_Fin || '',
+            Precio_Base: paquete.precio_Base,
+            ID_Destino: paquete.iD_Destino,
+            Inclusiones: paquete.inclusiones || '',
+            Exclusiones: paquete.exclusiones || ''
+          }
         };
-        await fetch(`${API}/Pago`, {
+
+        const resConfirm = await fetch(`${API}/Reserva/confirmar`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(pagoBody)
+          body: JSON.stringify(payload)
         });
+
+        if (!resConfirm.ok) {
+          const errorData = await resConfirm.json().catch(() => ({}));
+          throw new Error(errorData.mensaje || `Error ${resConfirm.status}`);
+        }
+
+        const response = await resConfirm.json();
+
+        if (!response.success) throw new Error(response.mensaje || 'Error desconocido');
 
         cerrarModalPago();
-        mostrarBoleta(idReserva, total, titular, numTransaccion, fechaReservaFormateada);
+        mostrarBoleta(
+          response.id_Reserva,
+          response.numero_Transaccion || `ILL-${Date.now()}`,
+          total,
+          titular,
+          { ...titular },
+          'Tarjeta'
+        );
+
+        if (response.correoEnviado) {
+          alert('✅ Reserva confirmada. Revisa tu correo electrónico.');
+        } else {
+          alert('⚠️ Reserva creada, pero no se pudo enviar el correo. Contacta a la agencia.');
+        }
 
       } catch (e) {
+        console.error('Error en procesarPago:', e);
         const errEl = document.getElementById('modal-error');
-        errEl.innerText = e.message || 'Error en el pago';
+        errEl.textContent = e.message || 'Error inesperado al procesar el pago.';
         errEl.classList.remove('hidden');
       } finally {
         setBtnLoading(false);
       }
+    }
+
+    async function obtenerOCrearCliente(titular) {
+      const correo = titular.correo;
+      const dniTitular = titular.pasaporte;
+
+      // 1. Buscar por DNI en caché o en BD
+      if (dniClienteCache[dniTitular]?.id) {
+        return dniClienteCache[dniTitular].id;
+      }
+      if (clienteCache[correo]?.id) {
+        return clienteCache[correo].id;
+      }
+
+      // 2. Buscar en la base de datos por correo
+      try {
+        const resCheck = await fetch(`${API}/Cliente/email?correo=${encodeURIComponent(correo)}`);
+        if (resCheck.ok) {
+          const listaRes = await fetch(`${API}/Cliente`);
+          const lista = await listaRes.json();
+          const cli = lista.find(c => (c.correo || c.Correo)?.toLowerCase() === correo.toLowerCase());
+          if (cli) {
+            const id = cli.iD_Cliente || cli.ID_Cliente;
+            clienteCache[correo] = { id: id, data: cli };
+            dniClienteCache[dniTitular] = { id: id, data: cli };
+            return id;
+          }
+        }
+      } catch (e) {
+        console.warn('Error buscando cliente por correo:', e);
+      }
+
+      // 3. Si no existe, crear nuevo cliente
+      const nuevoCliente = {
+        iD_Usuario: 1,  // Asume que existe un usuario con ID 1 (ajusta según tu lógica)
+        frecuencia_Viajero: 'Normal',
+        correo: correo,
+        nombre: titular.nombre,
+        apellido: titular.apellido,
+        telefono: titular.telefono,
+        direccion: titular.direccion,
+        nacionalidad: titular.nacionalidad,
+        pasaporte: titular.pasaporte,
+        fecha_Nacimiento: titular.fechaNac ? new Date(titular.fechaNac).toLocaleDateString('es-PE') : ''
+      };
+
+      const resPost = await fetch(`${API}/Cliente`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoCliente)
+      });
+
+      if (!resPost.ok) {
+        const errorText = await resPost.text();
+        throw new Error(`Error al crear cliente: ${resPost.status} - ${errorText}`);
+      }
+
+      const creado = await resPost.json();
+      const idCliente = creado.iD_Cliente || creado.ID_Cliente;
+      if (!idCliente) throw new Error('No se pudo obtener ID del cliente creado');
+
+      clienteCache[correo] = { id: idCliente, data: creado };
+      dniClienteCache[dniTitular] = { id: idCliente, data: creado };
+      return idCliente;
     }
 
     /* ═══════════════════════════ BOLETA MEJORADA (COMPROBANTE) ═════════════════ */
