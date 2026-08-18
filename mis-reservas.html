@@ -13,6 +13,9 @@
       font-family: 'Inter', sans-serif;
       background: #0A0A0A;
       color: #F5F5F5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
     .field {
       background: #1F1F1F;
@@ -92,6 +95,12 @@
         min-width: 80px;
       }
     }
+    main {
+      flex: 1;
+    }
+    .footer {
+      margin-top: auto;
+    }
   </style>
 </head>
 <body>
@@ -122,7 +131,7 @@
     <div class="max-w-3xl mx-auto">
       <p class="text-red-300 font-bold uppercase tracking-widest text-sm"><i class="fas fa-ticket-alt mr-2"></i>Seguimiento</p>
       <h1 class="text-4xl md:text-5xl font-black mt-2">Mis reservas</h1>
-      <p class="text-gray-300 mt-3">Consulta el estado de tus viajes con solo tu DNI.</p>
+      <p class="text-gray-300 mt-3">Consulta el estado de tus viajes con solo tu DNI</p>
     </div>
   </div>
 
@@ -155,8 +164,8 @@
     </div>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="bg-black border-t border-red-900/30 py-8 mt-16">
+  <!-- FOOTER (siempre al final) -->
+  <footer class="footer bg-black border-t border-red-900/30 py-8 mt-16">
     <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
       <div class="text-xl font-extrabold"><span class="text-red-600">ILLARIY</span> <span class="text-white font-light">Travel</span></div>
       <div class="flex gap-6"><a href="#" class="hover:text-red-400">Política de privacidad</a><a href="#" class="hover:text-red-400">Términos y condiciones</a></div>
@@ -184,14 +193,12 @@
 
     function formatearFecha(fechaStr) {
       if (!fechaStr) return '—';
-      // Si viene en formato "DD/MM/YYYY hh:mm am/pm"
       const partes = fechaStr.split(' ');
-      const fecha = partes[0]; // "DD/MM/YYYY"
+      const fecha = partes[0];
       const hora = partes.slice(1).join(' ') || '';
       if (fecha.includes('/')) {
         return `${fecha} ${hora}`.trim();
       }
-      // Si viene en formato ISO
       const iso = fechaStr.split('T');
       if (iso.length === 2) {
         const [y, m, d] = iso[0].split('-');
@@ -216,7 +223,6 @@
     }
 
     function estadoTexto(estado) {
-      // Mapeamos "Pagado" a "Registrado"
       if (estado === 'Pagado' || estado === 'Confirmada') return 'Registrado';
       return estado || 'Pendiente';
     }
@@ -238,12 +244,10 @@
     // ─── OBTENER RESERVAS POR CLIENTE ────────────────────────────────
     async function obtenerReservasPorCliente(idCliente) {
       try {
-        // Intentamos endpoint específico
         let res = await fetch(`${API_BASE}/Reserva/cliente/${idCliente}`);
         if (res.ok) {
           return await res.json();
         }
-        // Fallback: obtener todas y filtrar
         res = await fetch(`${API_BASE}/Reserva`);
         if (!res.ok) throw new Error('No se pudieron obtener las reservas.');
         const todas = await res.json();
@@ -260,7 +264,6 @@
         const res = await fetch(`${API_BASE}/Paquete/${idPaquete}`);
         if (!res.ok) return null;
         const paquete = await res.json();
-        // Obtener destino si existe
         let destino = null;
         const idDestino = paquete.iD_Destino || paquete.ID_Destino;
         if (idDestino) {
@@ -287,7 +290,6 @@
         return;
       }
 
-      // Construir HTML de tarjetas
       let html = `
         <div class="mb-6 flex items-center justify-between">
           <h2 class="text-2xl font-black text-white">Tus reservas (${reservas.length})</h2>
@@ -296,10 +298,8 @@
         <div class="grid gap-6">
       `;
 
-      // Ordenar por fecha descendente (más reciente primero)
       reservas.sort((a, b) => new Date(b.fecha_Reserva || b.Fecha_Reserva) - new Date(a.fecha_Reserva || a.Fecha_Reserva));
 
-      // Procesar cada reserva con sus detalles
       for (const reserva of reservas) {
         const idPaq = reserva.iD_Paquete || reserva.ID_Paquete;
         const data = await obtenerPaqueteConDestino(idPaq);
@@ -314,7 +314,6 @@
         const personas = reserva.numero_Personas || reserva.Numero_Personas || 0;
         const acompanantes = personas > 0 ? personas - 1 : 0;
 
-        // Fechas del paquete
         const fechaInicio = paquete ? formatearFecha(paquete.fecha_Inicio || paquete.Fecha_Inicio) : '—';
         const fechaFin = paquete ? formatearFecha(paquete.fecha_Fin || paquete.Fecha_Fin) : '—';
         const duracion = paquete ? paquete.duracion || '—' : '—';
@@ -322,7 +321,6 @@
         const inclusiones = paquete ? paquete.inclusiones || 'No especificadas' : '—';
         const exclusiones = paquete ? paquete.exclusiones || 'No especificadas' : '—';
 
-        // Datos del destino
         const ciudadDestino = destino ? destino.ciudad || '—' : '—';
         const atracciones = destino ? destino.atracciones || '—' : '—';
         const clima = destino ? destino.clima || '—' : '—';
@@ -340,12 +338,10 @@
               </div>
               <div class="flex items-center gap-4">
                 <span class="badge-estado ${badgeClass}">${estado}</span>
-                <!-- Opcional: enlace al paquete (lo dejamos como texto para no tener botón) -->
-                <span class="text-gray-500 text-sm">ID: ${idPaq}</span>
+                <!-- ID eliminado -->
               </div>
             </div>
 
-            <!-- Detalles adicionales -->
             <div class="detalle-grid">
               <div class="detalle-item">
                 <span class="label">Inicio del paquete:</span>
@@ -402,7 +398,6 @@
         return;
       }
 
-      // Mostrar indicador de carga
       resultsContainer.innerHTML = `
         <div class="text-center py-12">
           <div class="spinner-border text-red-500" style="width:3rem;height:3rem;" role="status">
