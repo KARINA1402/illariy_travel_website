@@ -1527,60 +1527,31 @@
 
     /* ═══════════════════════════ PROCESAR PAGO ═════════════════════════════════ */
     async function procesarPago() {
-
-      // Obtener o crear cliente
-      const idCliente = await obtenerOCrearCliente(titular);
-      if (!idCliente) throw new Error('No se pudo obtener el ID del cliente.');
-
-
-      const fechaInicio = parseFecha(paquete.fecha_Inicio);
-      const fechaFin = parseFecha(paquete.fecha_Fin);
-      if (fechaInicio && fechaFin) {
-        const resultado = await verificarConflictosReserva(idCliente, idPaquete, fechaInicio, fechaFin);
-        if (resultado.conflict) {
-          alert(`❌ ${resultado.mensaje}`);
-          setBtnLoading(false);
-          return;
-        }
+      // ─── 1. OBTENER DATOS DEL TITULAR ──────────────────────────────
+      const titular = getDatosPasajero(0);
+      if (!titular) {
+        alert('No se pudieron obtener los datos del titular.');
+        return;
+      }
+      if (!titular.correo || !titular.correo.trim()) {
+        alert('El correo electrónico del titular es obligatorio.');
+        return;
       }
 
-      // ============================================
-      // 1. VALIDAR TARJETA
-      // ============================================
+      // ─── 2. VALIDAR TARJETA (antes de cualquier proceso pesado) ──────
       if (!validarTarjeta()) {
         return;
       }
 
       setBtnLoading(true);
-
       const modalError = document.getElementById('modal-error');
-
       if (modalError) {
         modalError.classList.add('hidden');
         modalError.textContent = '';
       }
 
       try {
-
-        // ============================================
-        // 2. OBTENER DATOS DEL TITULAR
-        // ============================================
-        const titular = getDatosPasajero(0);
-
-        if (!titular) {
-          throw new Error('No se pudieron obtener los datos del titular.');
-        }
-
-        // Validar correo explícitamente
-        if (!titular.correo || !titular.correo.trim()) {
-          throw new Error('El correo electrónico del titular es obligatorio.');
-        }
-
-        const correoTitular = titular.correo.trim();
-
-        // ============================================
-        // 3. DATOS DEL PAQUETE
-        // ============================================
+        // ─── 3. DATOS DEL PAQUETE ──────────────────────────────────────
         if (!paquete) {
           throw new Error('No se encontró la información del paquete.');
         }
@@ -1588,426 +1559,165 @@
         const idPaquete = parseInt(
           new URLSearchParams(window.location.search).get('iD_Paquete')
         );
-
         if (!idPaquete || isNaN(idPaquete)) {
           throw new Error('No se encontró el ID del paquete.');
         }
 
-        // ============================================
-        // 4. CALCULAR TOTAL
-        // ============================================
+        // ─── 4. CALCULAR TOTAL ─────────────────────────────────────────
         const precioBase = Number(paquete.precio_Base || 0);
         const total = precioBase * numeroPax;
-
         if (total <= 0) {
           throw new Error('El importe de la reserva no es válido.');
         }
 
-        // ============================================
-        // 5. OBTENER O CREAR CLIENTE
-        // ============================================
+        // ─── 5. OBTENER O CREAR CLIENTE ────────────────────────────────
         const idCliente = await obtenerOCrearCliente(titular);
-
         if (!idCliente) {
           throw new Error('No se pudo obtener el ID del cliente.');
         }
-
         console.log('Cliente obtenido:', idCliente);
-        console.log('Correo del titular:', correoTitular);
 
-        // ============================================
-        // 6. CONSTRUIR ACOMPAÑANTES
-        // ============================================
-        const acompanantes = [];
-
-        for (let i = 1; i < numeroPax; i++) {
-
-          const pasajero = getDatosPasajero(i);
-
-          if (!pasajero) {
-            throw new Error(
-              `No se pudieron obtener los datos del pasajero ${i + 1}.`
-            );
+        // ─── 6. VALIDAR CONFLICTOS DE FECHAS (duplicados y cruces) ────
+        const fechaInicio = parseFecha(paquete.fecha_Inicio);
+        const fechaFin = parseFecha(paquete.fecha_Fin);
+        if (fechaInicio && fechaFin) {
+          const resultado = await verificarConflictosReserva(
+            idCliente,
+            idPaquete,
+            fechaInicio,
+            fechaFin
+          );
+          if (resultado.conflict) {
+            alert(`❌ ${resultado.mensaje}`);
+            setBtnLoading(false);
+            return;
           }
+        }
 
+        // ─── 7. CONSTRUIR PAYLOAD ──────────────────────────────────────
+        const correoTitular = titular.correo.trim();
+        const fechaReserva = formatearFechaReserva();
+        const numeroTransaccion = `ILL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+        // Construir acompañantes
+        const acompanantes = [];
+        for (let i = 1; i < numeroPax; i++) {
+          const pasajero = getDatosPasajero(i);
+          if (!pasajero) {
+            throw new Error(`No se pudieron obtener los datos del pasajero ${i + 1}.`);
+          }
           acompanantes.push({
             ID_Cliente: 0,
-
             Nombre: pasajero.nombre || '',
             Apellido: pasajero.apellido || '',
-
             Telefono: pasajero.telefono || '',
             Correo: pasajero.correo || '',
-
             Pasaporte: pasajero.pasaporte || '',
             Nacionalidad: pasajero.nacionalidad || '',
-
             Fecha_Nacimiento: pasajero.fechaNac || ''
           });
         }
 
-        // ============================================
-        // 7. GENERAR FECHA Y TRANSACCIÓN
-        // ============================================
-        const fechaReserva = formatearFechaReserva();
-
-        const numeroTransaccion =
-          `ILL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-        // ============================================
-        // 8. CONSTRUIR PAYLOAD
-        // ============================================
         const payload = {
-
-          // -------------------------
-          // RESERVA
-          // -------------------------
           ID_Cliente: idCliente,
-
           ID_Paquete: idPaquete,
-
           Fecha_Reserva: fechaReserva,
-
           Numero_Personas: numeroPax,
-
           Precio_Total: total,
-
           Observaciones: '',
-
-          // -------------------------
-          // PAGO
-          // -------------------------
           Metodo_Pago: 'Tarjeta',
-
           Monto: total,
-
           Fecha_Pago: fechaReserva,
-
           Numero_Transaccion: numeroTransaccion,
-
           Moneda: 'PEN',
-
-          // -------------------------
-          // DESTINO
-          // -------------------------
-          DestinoNombre:
-            paquete.destino ||
-            paquete.nombre ||
-            '',
-
-          // ========================================
-          // CLIENTE
-          // IMPORTANTE PARA EL CORREO
-          // ========================================
+          DestinoNombre: paquete.destino || paquete.nombre || '',
           Cliente: {
-
             ID_Cliente: idCliente,
-
             Nombre: titular.nombre || '',
-
             Apellido: titular.apellido || '',
-
             Telefono: titular.telefono || '',
-
             Correo: correoTitular,
-
             Pasaporte: titular.pasaporte || '',
-
             Nacionalidad: titular.nacionalidad || '',
-
             Direccion: titular.direccion || '',
-
             Fecha_Nacimiento: titular.fechaNac || ''
           },
-
-          // ========================================
-          // ACOMPAÑANTES
-          // ========================================
           Acompanantes: acompanantes,
-
-          // ========================================
-          // PAQUETE
-          // ========================================
           Paquete: {
-
-            ID_Paquete:
-              paquete.iD_Paquete ||
-              idPaquete,
-
-            Nombre:
-              paquete.nombre ||
-              '',
-
-            Descripcion:
-              paquete.descripcion ||
-              '',
-
-            Fecha_Inicio:
-              paquete.fecha_Inicio ||
-              '',
-
-            Fecha_Fin:
-              paquete.fecha_Fin ||
-              '',
-
-            Precio_Base:
-              precioBase,
-
-            ID_Destino:
-              paquete.iD_Destino ||
-              0,
-
-            Inclusiones:
-              paquete.inclusiones ||
-              '',
-
-            Exclusiones:
-              paquete.exclusiones ||
-              ''
+            ID_Paquete: paquete.iD_Paquete || idPaquete,
+            Nombre: paquete.nombre || '',
+            Descripcion: paquete.descripcion || '',
+            Fecha_Inicio: paquete.fecha_Inicio || '',
+            Fecha_Fin: paquete.fecha_Fin || '',
+            Precio_Base: precioBase,
+            ID_Destino: paquete.iD_Destino || 0,
+            Inclusiones: paquete.inclusiones || '',
+            Exclusiones: paquete.exclusiones || ''
           }
         };
 
-        // ============================================
-        // 9. MOSTRAR PAYLOAD EN CONSOLA
-        // ============================================
-        console.log(
-          '===================================='
-        );
+        console.log('ENVIANDO RESERVA AL BACKEND', payload);
 
-        console.log(
-          'ENVIANDO RESERVA AL BACKEND'
-        );
+        // ─── 8. ENVIAR AL BACKEND ─────────────────────────────────────
+        const urlConfirmar = `${API}/Reserva/confirmar`;
+        const resConfirm = await fetch(urlConfirmar, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
 
-        console.log(
-          'Correo:',
-          payload.Cliente.Correo
-        );
-
-        console.log(
-          'ID Cliente:',
-          payload.ID_Cliente
-        );
-
-        console.log(
-          'ID Paquete:',
-          payload.ID_Paquete
-        );
-
-        console.log(
-          'Método:',
-          payload.Metodo_Pago
-        );
-
-        console.log(
-          'Transacción:',
-          payload.Numero_Transaccion
-        );
-
-        console.log(
-          'Payload completo:',
-          payload
-        );
-
-        console.log(
-          '===================================='
-        );
-
-        // ============================================
-        // 10. ENVIAR AL BACKEND
-        // ============================================
-        const urlConfirmar =
-          `${API}/Reserva/confirmar`;
-
-        console.log(
-          'POST:',
-          urlConfirmar
-        );
-
-        const resConfirm = await fetch(
-          urlConfirmar,
-          {
-            method: 'POST',
-
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-
-            body: JSON.stringify(payload)
-          }
-        );
-
-        // ============================================
-        // 11. LEER RESPUESTA DEL BACKEND
-        // ============================================
-        const textoRespuesta =
-          await resConfirm.text();
-
-        console.log(
-          'HTTP:',
-          resConfirm.status
-        );
-
-        console.log(
-          'Respuesta backend:',
-          textoRespuesta
-        );
+        const textoRespuesta = await resConfirm.text();
+        console.log('HTTP:', resConfirm.status);
+        console.log('Respuesta backend:', textoRespuesta);
 
         let response = {};
-
         try {
-
-          response =
-            textoRespuesta
-              ? JSON.parse(textoRespuesta)
-              : {};
-
-        } catch (errorJson) {
-
-          console.error(
-            'Respuesta no es JSON:',
-            textoRespuesta
-          );
-
-          throw new Error(
-            `El servidor respondió con una respuesta inválida. HTTP ${resConfirm.status}`
-          );
+          response = textoRespuesta ? JSON.parse(textoRespuesta) : {};
+        } catch (e) {
+          console.error('Respuesta no es JSON:', textoRespuesta);
+          throw new Error(`El servidor respondió con una respuesta inválida. HTTP ${resConfirm.status}`);
         }
 
-        // ============================================
-        // 12. ERROR HTTP
-        // ============================================
         if (!resConfirm.ok) {
-
-          throw new Error(
-            response.mensaje ||
-            response.message ||
-            response.error ||
-            `Error HTTP ${resConfirm.status}`
-          );
+          throw new Error(response.mensaje || response.message || response.error || `Error HTTP ${resConfirm.status}`);
         }
-
-        // ============================================
-        // 13. ERROR LÓGICO DEL BACKEND
-        // ============================================
         if (response.success === false) {
-
-          throw new Error(
-            response.mensaje ||
-            response.message ||
-            'El backend no pudo confirmar la reserva.'
-          );
+          throw new Error(response.mensaje || response.message || 'El backend no pudo confirmar la reserva.');
         }
 
-        // ============================================
-        // 14. VERIFICAR ID DE RESERVA
-        // ============================================
-        const idReserva =
-          response.id_Reserva ||
-          response.ID_Reserva ||
-          response.idReserva;
-
+        const idReserva = response.id_Reserva || response.ID_Reserva || response.idReserva;
         if (!idReserva) {
           console.warn('El backend no devolvió id_Reserva.', response);
         }
 
-        const numeroTransaccionBackend =
-          response.numeroTransaccion ||
-          response.Numero_Transaccion ||
-          response.transaccion ||
-          numeroTransaccion;
-
-        // ============================================
-        // 15. CERRAR MODAL
-        // ============================================
+        // ─── 9. CERRAR MODAL Y MOSTRAR BOLETA ──────────────────────────
         cerrarModalPago();
+        mostrarBoleta(idReserva, total, titular, numeroTransaccion, fechaReserva);
 
-        // ============================================
-        // 16. MOSTRAR BOLETA
-        // ============================================
-        mostrarBoleta(
-          idReserva,
-          total,
-          titular,
-          numeroTransaccion,
-          fechaReserva
-        );
-
-        // ============================================
-        // 17. RESULTADO DEL ENVÍO DE CORREO
-        // ============================================
-        const correoEnviado =
-          response.correoEnviado === true ||
-          response.CorreoEnviado === true;
-
-        console.log(
-          '¿Correo enviado?:',
-          correoEnviado
-        );
-
-        console.log(
-          'Correo destino:',
-          correoTitular
-        );
+        // ─── 10. RESULTADO DEL ENVÍO DE CORREO ────────────────────────
+        const correoEnviado = response.correoEnviado === true || response.CorreoEnviado === true;
+        console.log('¿Correo enviado?:', correoEnviado);
+        console.log('Correo destino:', correoTitular);
 
         if (correoEnviado) {
-
-          alert(
-            '✅ Reserva confirmada correctamente.\n\n' +
-            'El comprobante ha sido enviado a:\n' +
-            correoTitular
-          );
-
+          alert('✅ Reserva confirmada correctamente.\n\nEl comprobante ha sido enviado a:\n' + correoTitular);
         } else {
-
-          alert(
-            '⚠️ Reserva creada correctamente, ' +
-            'pero el backend no pudo enviar el correo.\n\n' +
-            'Correo destino:\n' +
-            correoTitular
-          );
-
-          console.warn(
-            'La reserva fue creada pero correoEnviado=false.'
-          );
+          alert('⚠️ Reserva creada correctamente, pero el backend no pudo enviar el correo.\n\nCorreo destino:\n' + correoTitular);
+          console.warn('La reserva fue creada pero correoEnviado=false.');
         }
 
       } catch (error) {
-
-        console.error(
-          '===================================='
-        );
-
-        console.error(
-          'ERROR EN PROCESAR PAGO'
-        );
-
-        console.error(
-          error
-        );
-
-        console.error(
-          '===================================='
-        );
-
+        console.error('ERROR EN PROCESAR PAGO:', error);
         if (modalError) {
-
-          modalError.textContent =
-            error?.message ||
-            'Error inesperado al procesar el pago.';
-
+          modalError.textContent = error?.message || 'Error inesperado al procesar el pago.';
           modalError.classList.remove('hidden');
-
         } else {
-
-          alert(
-            error?.message ||
-            'Error inesperado al procesar el pago.'
-          );
+          alert(error?.message || 'Error inesperado al procesar el pago.');
         }
-
       } finally {
-
         setBtnLoading(false);
       }
     }
