@@ -988,6 +988,9 @@
       const total = precio * numeroPax;
       const igv = total - (total / 1.18);
       const subtotal = total - igv;
+      if (isNaN(total) || total <= 0) {
+        throw new Error('El precio del paquete no es válido.');
+      }
       document.getElementById('sum-unit').innerText = `S/ ${precio.toFixed(2)}`;
       document.getElementById('sum-qty').innerText = numeroPax;
       document.getElementById('sum-subtotal').innerText = `S/ ${subtotal.toFixed(2)}`;
@@ -1050,47 +1053,90 @@
 
       try {
         const titular = getDatosPasajero(0);
-        const total = paquete.precio_Base * numeroPax;
-        const idPaquete = parseInt(new URLSearchParams(location.search).get('iD_Paquete'));
+        const correo = titular.correo;
+        const precio = parseFloat(paquete.precio_Base || paquete.precio || 0);
+        const total = precio * numeroPax;
+        const idPaquete = parseInt(
+          new URLSearchParams(window.location.search).get('iD_Paquete') ||
+          new URLSearchParams(window.location.search).get('id')
+        );
 
-        // Obtener o crear el cliente
-        const idCliente = await obtenerOCrearCliente(titular);
+        let idCliente = null;
+        const dniTitular = titular.dni;
+        if (dniClienteCache[dniTitular]?.id) {
+          idCliente = dniClienteCache[dniTitular].id;
+        } else if (clienteCache[correo]?.id) {
+          idCliente = clienteCache[correo].id;
+        } else {
+          let cli = null;
+          try {
+            const resLista = await fetch(`${API}/Cliente`);
+            const lista = await resLista.json();
+            cli = lista.find(c => (c.correo || c.Correo || '').toLowerCase() === correo.toLowerCase());
+            if (cli) clienteCache[correo] = { id: cli.iD_Cliente, data: cli };
+          } catch (e) { }
+          if (cli?.iD_Cliente) {
+            idCliente = cli.iD_Cliente;
+          } else {
+            const nuevoCliente = {
+              iD_Usuario: 1,
+              frecuencia_Viajero: 'Normal',
+              correo: correo,
+              nombre: titular.nombre,
+              apellido: titular.apellido,
+              telefono: titular.telefono,
+              direccion: titular.direccion,
+              nacionalidad: titular.nacionalidad,
+              pasaporte: titular.dni,
+              fecha_Nacimiento: formatDateForApi(titular.fechaNac),
+            };
+            const resPost = await fetch(`${API}/Cliente`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(nuevoCliente),
+            });
+            if (!resPost.ok) throw new Error(`Error al crear cliente: ${await resPost.text()}`);
+            const cliCreado = await resPost.json();
+            idCliente = cliCreado.iD_Cliente;
+            clienteCache[correo] = { id: idCliente, data: cliCreado };
+            dniClienteCache[dniTitular] = { id: idCliente, data: cliCreado };
+          }
+        }
+        if (!idCliente) throw new Error('No se pudo obtener el ID del cliente.');
 
-        // Construir acompañantes
         const acompanantes = [];
         for (let i = 1; i < numeroPax; i++) {
           const p = getDatosPasajero(i);
           acompanantes.push({
-            Nombre: p.nombre,
-            Apellido: p.apellido,
-            Pasaporte: p.pasaporte,
-            Nacionalidad: p.nacionalidad,
-            Telefono: '',
-            Correo: ''
+            ID_Cliente: 0, Nombre: p.nombre, Apellido: p.apellido,
+            Telefono: '', Correo: '', Pasaporte: p.dni, Nacionalidad: p.nacionalidad
           });
         }
+
+        const fechaFormateada = formatearFechaReserva(new Date());
+        const numeroTransaccion = `WEB-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
         const payload = {
           ID_Cliente: idCliente,
           ID_Paquete: idPaquete,
-          Fecha_Reserva: formatearFechaReserva(),
+          Fecha_Reserva: fechaFormateada,
           Numero_Personas: numeroPax,
           Precio_Total: total,
           Observaciones: '',
-          Metodo_Pago: 'Tarjeta',
+          Metodo_Pago: 'Tarjeta (Prueba)',
           Monto: total,
-          Fecha_Pago: formatearFechaReserva(),
-          Numero_Transaccion: `ILL-${Date.now()}`,
-          Moneda: 'PEN',
-          DestinoNombre: paquete.destino || '',
+          Fecha_Pago: fechaFormateada,
+          Numero_Transaccion: numeroTransaccion,
+          Moneda: destino?.moneda || 'PEN',
+          DestinoNombre: destino?.nombre || '',
           Cliente: {
             ID_Cliente: idCliente,
             Nombre: titular.nombre,
             Apellido: titular.apellido,
             Telefono: titular.telefono,
             Correo: titular.correo,
-            Pasaporte: titular.pasaporte,
-            Nacionalidad: titular.nacionalidad
+            Pasaporte: titular.dni,
+            Nacionalidad: titular.nacionalidad,
           },
           Acompanantes: acompanantes,
           Paquete: {
@@ -1102,40 +1148,31 @@
             Precio_Base: paquete.precio_Base,
             ID_Destino: paquete.iD_Destino,
             Inclusiones: paquete.inclusiones || '',
-            Exclusiones: paquete.exclusiones || ''
-          }
+            Exclusiones: paquete.exclusiones || '',
+          },
         };
 
         const resConfirm = await fetch(`${API}/Reserva/confirmar`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         });
 
         if (!resConfirm.ok) {
           const errorData = await resConfirm.json().catch(() => ({}));
-          throw new Error(errorData.mensaje || `Error ${resConfirm.status}`);
+          throw new Error(errorData.mensaje || `Error ${resConfirm.status} al confirmar reserva`);
         }
 
         const response = await resConfirm.json();
-
         if (!response.success) throw new Error(response.mensaje || 'Error desconocido');
 
         cerrarModalPago();
-        mostrarBoleta(
-          response.id_Reserva,
-          response.numero_Transaccion || `ILL-${Date.now()}`,
-          total,
-          titular,
-          { ...titular },
-          'Tarjeta'
-        );
+        const clienteParaBoleta = { ...titular, ...payload.Cliente };
+        mostrarBoleta(response.id_Reserva, payload.Numero_Transaccion, total,
+          titular, clienteParaBoleta, payload.Metodo_Pago);
 
-        if (response.correoEnviado) {
-          alert('✅ Reserva confirmada. Revisa tu correo electrónico.');
-        } else {
-          alert('⚠️ Reserva creada, pero no se pudo enviar el correo. Contacta a la agencia.');
-        }
+        if (response.correoEnviado) showToast('✅ El comprobante ha sido enviado a tu correo electrónico.', 'ok');
+        else showToast('⚠️ Reserva creada, pero no se pudo enviar el correo.', 'warn');
 
       } catch (e) {
         console.error('Error en procesarPago:', e);
@@ -1219,7 +1256,12 @@
       const subtotal = total - igv;
       const nroOperacion = `B001-${idReserva}`;
       const fechaEmision = fechaReservaStr || formatearFechaReserva();
+      const totalNum = parseFloat(total);
 
+      if (isNaN(totalNum)) {
+        console.error('Total inválido:', total);
+        return;
+      }
       // Construir pasajeros
       let pasajerosHtml = '';
       for (let i = 0; i < numeroPax; i++) {
