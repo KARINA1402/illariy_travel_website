@@ -988,9 +988,6 @@
       const total = precio * numeroPax;
       const igv = total - (total / 1.18);
       const subtotal = total - igv;
-      if (isNaN(total) || total <= 0) {
-        throw new Error('El precio del paquete no es válido.');
-      }
       document.getElementById('sum-unit').innerText = `S/ ${precio.toFixed(2)}`;
       document.getElementById('sum-qty').innerText = numeroPax;
       document.getElementById('sum-subtotal').innerText = `S/ ${subtotal.toFixed(2)}`;
@@ -1047,204 +1044,766 @@
 
     /* ═══════════════════════════ PROCESAR PAGO ═════════════════════════════════ */
     async function procesarPago() {
-      if (!validarTarjeta()) return;
+
+      // ============================================
+      // 1. VALIDAR TARJETA
+      // ============================================
+      if (!validarTarjeta()) {
+        return;
+      }
+
       setBtnLoading(true);
-      document.getElementById('modal-error').classList.add('hidden');
+
+      const modalError = document.getElementById('modal-error');
+
+      if (modalError) {
+        modalError.classList.add('hidden');
+        modalError.textContent = '';
+      }
 
       try {
+
+        // ============================================
+        // 2. OBTENER DATOS DEL TITULAR
+        // ============================================
         const titular = getDatosPasajero(0);
-        const correo = titular.correo;
-        const precio = parseFloat(paquete.precio_Base || paquete.precio || 0);
-        const total = precio * numeroPax;
+
+        if (!titular) {
+          throw new Error('No se pudieron obtener los datos del titular.');
+        }
+
+        // Validar correo explícitamente
+        if (!titular.correo || !titular.correo.trim()) {
+          throw new Error('El correo electrónico del titular es obligatorio.');
+        }
+
+        const correoTitular = titular.correo.trim();
+
+        // ============================================
+        // 3. DATOS DEL PAQUETE
+        // ============================================
+        if (!paquete) {
+          throw new Error('No se encontró la información del paquete.');
+        }
+
         const idPaquete = parseInt(
-          new URLSearchParams(window.location.search).get('iD_Paquete') ||
-          new URLSearchParams(window.location.search).get('id')
+          new URLSearchParams(window.location.search).get('iD_Paquete')
         );
 
-        let idCliente = null;
-        const dniTitular = titular.dni;
-        if (dniClienteCache[dniTitular]?.id) {
-          idCliente = dniClienteCache[dniTitular].id;
-        } else if (clienteCache[correo]?.id) {
-          idCliente = clienteCache[correo].id;
-        } else {
-          let cli = null;
-          try {
-            const resLista = await fetch(`${API}/Cliente`);
-            const lista = await resLista.json();
-            cli = lista.find(c => (c.correo || c.Correo || '').toLowerCase() === correo.toLowerCase());
-            if (cli) clienteCache[correo] = { id: cli.iD_Cliente, data: cli };
-          } catch (e) { }
-          if (cli?.iD_Cliente) {
-            idCliente = cli.iD_Cliente;
-          } else {
-            const nuevoCliente = {
-              iD_Usuario: 1,
-              frecuencia_Viajero: 'Normal',
-              correo: correo,
-              nombre: titular.nombre,
-              apellido: titular.apellido,
-              telefono: titular.telefono,
-              direccion: titular.direccion,
-              nacionalidad: titular.nacionalidad,
-              pasaporte: titular.dni,
-              fecha_Nacimiento: formatDateForApi(titular.fechaNac),
-            };
-            const resPost = await fetch(`${API}/Cliente`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(nuevoCliente),
-            });
-            if (!resPost.ok) throw new Error(`Error al crear cliente: ${await resPost.text()}`);
-            const cliCreado = await resPost.json();
-            idCliente = cliCreado.iD_Cliente;
-            clienteCache[correo] = { id: idCliente, data: cliCreado };
-            dniClienteCache[dniTitular] = { id: idCliente, data: cliCreado };
-          }
+        if (!idPaquete || isNaN(idPaquete)) {
+          throw new Error('No se encontró el ID del paquete.');
         }
-        if (!idCliente) throw new Error('No se pudo obtener el ID del cliente.');
 
+        // ============================================
+        // 4. CALCULAR TOTAL
+        // ============================================
+        const precioBase = Number(paquete.precio_Base || 0);
+        const total = precioBase * numeroPax;
+
+        if (total <= 0) {
+          throw new Error('El importe de la reserva no es válido.');
+        }
+
+        // ============================================
+        // 5. OBTENER O CREAR CLIENTE
+        // ============================================
+        const idCliente = await obtenerOCrearCliente(titular);
+
+        if (!idCliente) {
+          throw new Error('No se pudo obtener el ID del cliente.');
+        }
+
+        console.log('Cliente obtenido:', idCliente);
+        console.log('Correo del titular:', correoTitular);
+
+        // ============================================
+        // 6. CONSTRUIR ACOMPAÑANTES
+        // ============================================
         const acompanantes = [];
+
         for (let i = 1; i < numeroPax; i++) {
-          const p = getDatosPasajero(i);
+
+          const pasajero = getDatosPasajero(i);
+
+          if (!pasajero) {
+            throw new Error(
+              `No se pudieron obtener los datos del pasajero ${i + 1}.`
+            );
+          }
+
           acompanantes.push({
-            ID_Cliente: 0, Nombre: p.nombre, Apellido: p.apellido,
-            Telefono: '', Correo: '', Pasaporte: p.dni, Nacionalidad: p.nacionalidad
+            ID_Cliente: 0,
+
+            Nombre: pasajero.nombre || '',
+            Apellido: pasajero.apellido || '',
+
+            Telefono: pasajero.telefono || '',
+            Correo: pasajero.correo || '',
+
+            Pasaporte: pasajero.pasaporte || '',
+            Nacionalidad: pasajero.nacionalidad || '',
+
+            Fecha_Nacimiento: pasajero.fechaNac || ''
           });
         }
 
-        const fechaFormateada = formatearFechaReserva(new Date());
-        const numeroTransaccion = `WEB-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        // ============================================
+        // 7. GENERAR FECHA Y TRANSACCIÓN
+        // ============================================
+        const fechaReserva = formatearFechaReserva();
 
+        const numeroTransaccion =
+          `ILL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+        // ============================================
+        // 8. CONSTRUIR PAYLOAD
+        // ============================================
         const payload = {
+
+          // -------------------------
+          // RESERVA
+          // -------------------------
           ID_Cliente: idCliente,
+
           ID_Paquete: idPaquete,
-          Fecha_Reserva: fechaFormateada,
+
+          Fecha_Reserva: fechaReserva,
+
           Numero_Personas: numeroPax,
+
           Precio_Total: total,
+
           Observaciones: '',
-          Metodo_Pago: 'Tarjeta (Prueba)',
+
+          // -------------------------
+          // PAGO
+          // -------------------------
+          Metodo_Pago: 'Tarjeta',
+
           Monto: total,
-          Fecha_Pago: fechaFormateada,
+
+          Fecha_Pago: fechaReserva,
+
           Numero_Transaccion: numeroTransaccion,
-          Moneda: destino?.moneda || 'PEN',
-          DestinoNombre: destino?.nombre || '',
+
+          Moneda: 'PEN',
+
+          // -------------------------
+          // DESTINO
+          // -------------------------
+          DestinoNombre:
+            paquete.destino ||
+            paquete.nombre ||
+            '',
+
+          // ========================================
+          // CLIENTE
+          // IMPORTANTE PARA EL CORREO
+          // ========================================
           Cliente: {
+
             ID_Cliente: idCliente,
-            Nombre: titular.nombre,
-            Apellido: titular.apellido,
-            Telefono: titular.telefono,
-            Correo: titular.correo,
-            Pasaporte: titular.dni,
-            Nacionalidad: titular.nacionalidad,
+
+            Nombre: titular.nombre || '',
+
+            Apellido: titular.apellido || '',
+
+            Telefono: titular.telefono || '',
+
+            Correo: correoTitular,
+
+            Pasaporte: titular.pasaporte || '',
+
+            Nacionalidad: titular.nacionalidad || '',
+
+            Direccion: titular.direccion || '',
+
+            Fecha_Nacimiento: titular.fechaNac || ''
           },
+
+          // ========================================
+          // ACOMPAÑANTES
+          // ========================================
           Acompanantes: acompanantes,
+
+          // ========================================
+          // PAQUETE
+          // ========================================
           Paquete: {
-            ID_Paquete: paquete.iD_Paquete,
-            Nombre: paquete.nombre,
-            Descripcion: paquete.descripcion || '',
-            Fecha_Inicio: paquete.fecha_Inicio || '',
-            Fecha_Fin: paquete.fecha_Fin || '',
-            Precio_Base: paquete.precio_Base,
-            ID_Destino: paquete.iD_Destino,
-            Inclusiones: paquete.inclusiones || '',
-            Exclusiones: paquete.exclusiones || '',
-          },
+
+            ID_Paquete:
+              paquete.iD_Paquete ||
+              idPaquete,
+
+            Nombre:
+              paquete.nombre ||
+              '',
+
+            Descripcion:
+              paquete.descripcion ||
+              '',
+
+            Fecha_Inicio:
+              paquete.fecha_Inicio ||
+              '',
+
+            Fecha_Fin:
+              paquete.fecha_Fin ||
+              '',
+
+            Precio_Base:
+              precioBase,
+
+            ID_Destino:
+              paquete.iD_Destino ||
+              0,
+
+            Inclusiones:
+              paquete.inclusiones ||
+              '',
+
+            Exclusiones:
+              paquete.exclusiones ||
+              ''
+          }
         };
 
-        const resConfirm = await fetch(`${API}/Reserva/confirmar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+        // ============================================
+        // 9. MOSTRAR PAYLOAD EN CONSOLA
+        // ============================================
+        console.log(
+          '===================================='
+        );
 
-        if (!resConfirm.ok) {
-          const errorData = await resConfirm.json().catch(() => ({}));
-          throw new Error(errorData.mensaje || `Error ${resConfirm.status} al confirmar reserva`);
+        console.log(
+          'ENVIANDO RESERVA AL BACKEND'
+        );
+
+        console.log(
+          'Correo:',
+          payload.Cliente.Correo
+        );
+
+        console.log(
+          'ID Cliente:',
+          payload.ID_Cliente
+        );
+
+        console.log(
+          'ID Paquete:',
+          payload.ID_Paquete
+        );
+
+        console.log(
+          'Método:',
+          payload.Metodo_Pago
+        );
+
+        console.log(
+          'Transacción:',
+          payload.Numero_Transaccion
+        );
+
+        console.log(
+          'Payload completo:',
+          payload
+        );
+
+        console.log(
+          '===================================='
+        );
+
+        // ============================================
+        // 10. ENVIAR AL BACKEND
+        // ============================================
+        const urlConfirmar =
+          `${API}/Reserva/confirmar`;
+
+        console.log(
+          'POST:',
+          urlConfirmar
+        );
+
+        const resConfirm = await fetch(
+          urlConfirmar,
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+
+            body: JSON.stringify(payload)
+          }
+        );
+
+        // ============================================
+        // 11. LEER RESPUESTA DEL BACKEND
+        // ============================================
+        const textoRespuesta =
+          await resConfirm.text();
+
+        console.log(
+          'HTTP:',
+          resConfirm.status
+        );
+
+        console.log(
+          'Respuesta backend:',
+          textoRespuesta
+        );
+
+        let response = {};
+
+        try {
+
+          response =
+            textoRespuesta
+              ? JSON.parse(textoRespuesta)
+              : {};
+
+        } catch (errorJson) {
+
+          console.error(
+            'Respuesta no es JSON:',
+            textoRespuesta
+          );
+
+          throw new Error(
+            `El servidor respondió con una respuesta inválida. HTTP ${resConfirm.status}`
+          );
         }
 
-        const response = await resConfirm.json();
-        if (!response.success) throw new Error(response.mensaje || 'Error desconocido');
+        // ============================================
+        // 12. ERROR HTTP
+        // ============================================
+        if (!resConfirm.ok) {
 
+          throw new Error(
+            response.mensaje ||
+            response.message ||
+            response.error ||
+            `Error HTTP ${resConfirm.status}`
+          );
+        }
+
+        // ============================================
+        // 13. ERROR LÓGICO DEL BACKEND
+        // ============================================
+        if (response.success === false) {
+
+          throw new Error(
+            response.mensaje ||
+            response.message ||
+            'El backend no pudo confirmar la reserva.'
+          );
+        }
+
+        // ============================================
+        // 14. VERIFICAR ID DE RESERVA
+        // ============================================
+        const idReserva =
+          response.id_Reserva ||
+          response.ID_Reserva ||
+          response.idReserva;
+
+        if (!idReserva) {
+
+          console.warn(
+            'El backend no devolvió id_Reserva.',
+            response
+          );
+
+        }
+
+        // ============================================
+        // 15. CERRAR MODAL
+        // ============================================
         cerrarModalPago();
-        const clienteParaBoleta = { ...titular, ...payload.Cliente };
-        mostrarBoleta(response.id_Reserva, payload.Numero_Transaccion, total,
-          titular, clienteParaBoleta, payload.Metodo_Pago);
 
-        if (response.correoEnviado) showToast('✅ El comprobante ha sido enviado a tu correo electrónico.', 'ok');
-        else showToast('⚠️ Reserva creada, pero no se pudo enviar el correo.', 'warn');
+        // ============================================
+        // 16. MOSTRAR BOLETA
+        // ============================================
+        mostrarBoleta(
+          idReserva,
+          total,
+          titular,
+          numeroTransaccion,
+          fechaReserva
+        );
 
-      } catch (e) {
-        console.error('Error en procesarPago:', e);
-        const errEl = document.getElementById('modal-error');
-        errEl.textContent = e.message || 'Error inesperado al procesar el pago.';
-        errEl.classList.remove('hidden');
+        // ============================================
+        // 17. RESULTADO DEL ENVÍO DE CORREO
+        // ============================================
+        const correoEnviado =
+          response.correoEnviado === true ||
+          response.CorreoEnviado === true;
+
+        console.log(
+          '¿Correo enviado?:',
+          correoEnviado
+        );
+
+        console.log(
+          'Correo destino:',
+          correoTitular
+        );
+
+        if (correoEnviado) {
+
+          alert(
+            '✅ Reserva confirmada correctamente.\n\n' +
+            'El comprobante ha sido enviado a:\n' +
+            correoTitular
+          );
+
+        } else {
+
+          alert(
+            '⚠️ Reserva creada correctamente, ' +
+            'pero el backend no pudo enviar el correo.\n\n' +
+            'Correo destino:\n' +
+            correoTitular
+          );
+
+          console.warn(
+            'La reserva fue creada pero correoEnviado=false.'
+          );
+        }
+
+      } catch (error) {
+
+        console.error(
+          '===================================='
+        );
+
+        console.error(
+          'ERROR EN PROCESAR PAGO'
+        );
+
+        console.error(
+          error
+        );
+
+        console.error(
+          '===================================='
+        );
+
+        if (modalError) {
+
+          modalError.textContent =
+            error?.message ||
+            'Error inesperado al procesar el pago.';
+
+          modalError.classList.remove('hidden');
+
+        } else {
+
+          alert(
+            error?.message ||
+            'Error inesperado al procesar el pago.'
+          );
+        }
+
       } finally {
+
         setBtnLoading(false);
       }
     }
 
     async function obtenerOCrearCliente(titular) {
-      const correo = titular.correo;
-      const dniTitular = titular.pasaporte;
 
-      // 1. Buscar por DNI en caché o en BD
-      if (dniClienteCache[dniTitular]?.id) {
-        return dniClienteCache[dniTitular].id;
-      }
-      if (clienteCache[correo]?.id) {
-        return clienteCache[correo].id;
+      if (!titular) {
+        throw new Error(
+          'No se recibieron los datos del titular.'
+        );
       }
 
-      // 2. Buscar en la base de datos por correo
+      const correo =
+        (titular.correo || '').trim();
+
+      const dniTitular =
+        (titular.pasaporte || titular.dni || '').trim();
+
+      if (!correo) {
+        throw new Error(
+          'El correo electrónico del titular es obligatorio.'
+        );
+      }
+
+      // ============================================
+      // 1. BUSCAR EN CACHE POR DNI
+      // ============================================
+      if (
+        typeof dniClienteCache !== 'undefined' &&
+        dniTitular &&
+        dniClienteCache[dniTitular]?.id
+      ) {
+
+        const cliente =
+          dniClienteCache[dniTitular];
+
+        console.log(
+          'Cliente encontrado en cache por DNI:',
+          cliente.id
+        );
+
+        return cliente.id;
+      }
+
+      // ============================================
+      // 2. BUSCAR EN CACHE POR CORREO
+      // ============================================
+      if (
+        typeof clienteCache !== 'undefined' &&
+        clienteCache[correo]?.id
+      ) {
+
+        const cliente =
+          clienteCache[correo];
+
+        console.log(
+          'Cliente encontrado en cache por correo:',
+          cliente.id
+        );
+
+        return cliente.id;
+      }
+
+      // ============================================
+      // 3. BUSCAR CLIENTE EN BACKEND POR CORREO
+      // ============================================
       try {
-        const resCheck = await fetch(`${API}/Cliente/email?correo=${encodeURIComponent(correo)}`);
+
+        const url =
+          `${API}/Cliente/email?correo=${encodeURIComponent(correo)}`;
+
+        console.log(
+          'Buscando cliente:',
+          url
+        );
+
+        const resCheck =
+          await fetch(url);
+
         if (resCheck.ok) {
-          const listaRes = await fetch(`${API}/Cliente`);
-          const lista = await listaRes.json();
-          const cli = lista.find(c => (c.correo || c.Correo)?.toLowerCase() === correo.toLowerCase());
-          if (cli) {
-            const id = cli.iD_Cliente || cli.ID_Cliente;
-            clienteCache[correo] = { id: id, data: cli };
-            dniClienteCache[dniTitular] = { id: id, data: cli };
-            return id;
+
+          /*
+           * Tu backend aparentemente tiene
+           * el endpoint /Cliente/email.
+           *
+           * Luego mantenemos la búsqueda de la
+           * lista para conservar la lógica actual.
+           */
+          const listaRes =
+            await fetch(`${API}/Cliente`);
+
+          if (listaRes.ok) {
+
+            const lista =
+              await listaRes.json();
+
+            const cliente =
+              lista.find(c => {
+
+                const email =
+                  c.correo ||
+                  c.Correo ||
+                  '';
+
+                return (
+                  email.trim().toLowerCase() ===
+                  correo.toLowerCase()
+                );
+              });
+
+            if (cliente) {
+
+              const id =
+                cliente.iD_Cliente ||
+                cliente.ID_Cliente;
+
+              if (id) {
+
+                if (
+                  typeof clienteCache !== 'undefined'
+                ) {
+
+                  clienteCache[correo] = {
+                    id: id,
+                    data: cliente
+                  };
+                }
+
+                if (
+                  typeof dniClienteCache !== 'undefined' &&
+                  dniTitular
+                ) {
+
+                  dniClienteCache[dniTitular] = {
+                    id: id,
+                    data: cliente
+                  };
+                }
+
+                console.log(
+                  'Cliente existente:',
+                  id
+                );
+
+                return id;
+              }
+            }
           }
         }
-      } catch (e) {
-        console.warn('Error buscando cliente por correo:', e);
+
+      } catch (error) {
+
+        console.warn(
+          'Error buscando cliente por correo:',
+          error
+        );
+
+        /*
+         * No detenemos aquí el proceso.
+         * Intentaremos crear el cliente.
+         */
       }
 
-      // 3. Si no existe, crear nuevo cliente
+      // ============================================
+      // 4. CREAR NUEVO CLIENTE
+      // ============================================
       const nuevoCliente = {
-        iD_Usuario: 1,  // Asume que existe un usuario con ID 1 (ajusta según tu lógica)
-        frecuencia_Viajero: 'Normal',
-        correo: correo,
-        nombre: titular.nombre,
-        apellido: titular.apellido,
-        telefono: titular.telefono,
-        direccion: titular.direccion,
-        nacionalidad: titular.nacionalidad,
-        pasaporte: titular.pasaporte,
-        fecha_Nacimiento: titular.fechaNac ? new Date(titular.fechaNac).toLocaleDateString('es-PE') : ''
+
+        iD_Usuario: 1,
+
+        frecuencia_Viajero:
+          'Normal',
+
+        correo:
+          correo,
+
+        nombre:
+          titular.nombre || '',
+
+        apellido:
+          titular.apellido || '',
+
+        telefono:
+          titular.telefono || '',
+
+        direccion:
+          titular.direccion || '',
+
+        nacionalidad:
+          titular.nacionalidad || '',
+
+        pasaporte:
+          titular.pasaporte ||
+          titular.dni ||
+          '',
+
+        fecha_Nacimiento:
+          titular.fechaNac
+            ? new Date(
+              titular.fechaNac
+            ).toLocaleDateString('es-PE')
+            : ''
       };
 
-      const resPost = await fetch(`${API}/Cliente`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nuevoCliente)
-      });
+      console.log(
+        'Creando nuevo cliente:',
+        nuevoCliente
+      );
+
+      const resPost =
+        await fetch(
+          `${API}/Cliente`,
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+
+            body:
+              JSON.stringify(nuevoCliente)
+          }
+        );
+
+      const texto =
+        await resPost.text();
 
       if (!resPost.ok) {
-        const errorText = await resPost.text();
-        throw new Error(`Error al crear cliente: ${resPost.status} - ${errorText}`);
+
+        throw new Error(
+          `Error al crear cliente: ${resPost.status} - ${texto}`
+        );
       }
 
-      const creado = await resPost.json();
-      const idCliente = creado.iD_Cliente || creado.ID_Cliente;
-      if (!idCliente) throw new Error('No se pudo obtener ID del cliente creado');
+      let creado;
 
-      clienteCache[correo] = { id: idCliente, data: creado };
-      dniClienteCache[dniTitular] = { id: idCliente, data: creado };
+      try {
+
+        creado =
+          texto
+            ? JSON.parse(texto)
+            : {};
+
+      } catch {
+
+        throw new Error(
+          'El backend creó el cliente pero devolvió una respuesta inválida.'
+        );
+      }
+
+      const idCliente =
+        creado.iD_Cliente ||
+        creado.ID_Cliente;
+
+      if (!idCliente) {
+
+        console.error(
+          'Respuesta al crear cliente:',
+          creado
+        );
+
+        throw new Error(
+          'No se pudo obtener el ID del cliente creado.'
+        );
+      }
+
+      // ============================================
+      // 5. ACTUALIZAR CACHE
+      // ============================================
+      if (
+        typeof clienteCache !== 'undefined'
+      ) {
+
+        clienteCache[correo] = {
+          id: idCliente,
+          data: creado
+        };
+      }
+
+      if (
+        typeof dniClienteCache !== 'undefined' &&
+        dniTitular
+      ) {
+
+        dniClienteCache[dniTitular] = {
+          id: idCliente,
+          data: creado
+        };
+      }
+
+      console.log(
+        'Cliente creado correctamente:',
+        idCliente
+      );
+
       return idCliente;
     }
 
@@ -1256,12 +1815,7 @@
       const subtotal = total - igv;
       const nroOperacion = `B001-${idReserva}`;
       const fechaEmision = fechaReservaStr || formatearFechaReserva();
-      const totalNum = parseFloat(total);
 
-      if (isNaN(totalNum)) {
-        console.error('Total inválido:', total);
-        return;
-      }
       // Construir pasajeros
       let pasajerosHtml = '';
       for (let i = 0; i < numeroPax; i++) {
