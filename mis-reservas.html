@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mis reservas – Illariy Travel</title>
+    <link rel="icon" href="assets/img/logo.png" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0A0A0A;
+            color: #F5F5F5;
+        }
+
+        .field {
+            background: #1F1F1F;
+            border: 1px solid #3F3F3F;
+            border-radius: 12px;
+            padding: 12px 16px 12px 44px;
+            width: 100%;
+            color: white;
+            transition: border 0.2s;
+        }
+
+        .field:focus {
+            border-color: #EF4444;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9CA3AF;
+        }
+
+        .btn-primary {
+            background: #DC2626;
+            transition: 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #B91C1C;
+        }
+
+        .reserva-card {
+            background: #18181B;
+            border: 1px solid #2C2C2C;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            transition: 0.2s;
+        }
+
+        .reserva-card:hover {
+            border-color: #DC2626;
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.15);
+        }
+
+        .badge-estado {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-confirmada {
+            background: #10B981;
+            color: white;
+        }
+
+        .badge-pendiente {
+            background: #F59E0B;
+            color: black;
+        }
+
+        .badge-cancelada {
+            background: #EF4444;
+            color: white;
+        }
+
+        .badge-finalizada {
+            background: #6B7280;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR (idéntico al resto del sitio) -->
+    <nav class="bg-black/80 backdrop-blur-md border-b border-red-900/40 sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="assets/img/logo.png" alt="Illariy Travel" class="h-8 w-auto" />
+                <span class="text-2xl font-extrabold tracking-tight">
+                    <span class="text-red-600">ILLARIY</span>
+                    <span class="text-white font-light">Travel</span>
+                </span>
+            </a>
+            <div class="flex items-center gap-5 text-sm font-semibold">
+                <a href="index.html" class="text-gray-300 hover:text-red-400 transition">Inicio</a>
+                <a href="destinos.html" class="text-gray-300 hover:text-red-400 transition">Aventuras</a>
+                <a href="galeria.html" class="text-gray-300 hover:text-red-400 transition">Galería</a>
+                <a href="mis-reservas.html" class="text-red-500 border-b-2 border-red-500 pb-1">Mis reservas</a>
+                <a href="registro.html"
+                    class="bg-red-700 hover:bg-red-800 text-white px-5 py-2 rounded-full transition shadow-md">Registrarse</a>
+                <a href="https://www.facebook.com/illariytravel" target="_blank"
+                    class="text-gray-400 hover:text-red-500 text-lg"><i class="fab fa-facebook-f"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="bg-gradient-to-r from-red-950 to-black py-16 px-4 text-center">
+        <div class="max-w-3xl mx-auto">
+            <p class="text-red-300 font-bold uppercase tracking-widest text-sm"><i
+                    class="fas fa-ticket-alt mr-2"></i>Seguimiento</p>
+            <h1 class="text-4xl md:text-5xl font-black mt-2">Mis reservas</h1>
+            <p class="text-gray-300 mt-3">Consulta el estado de tus viajes con solo tu DNI.</p>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container mx-auto px-4 py-12 max-w-5xl">
+        <!-- FORMULARIO DE BÚSQUEDA -->
+        <div class="bg-zinc-900 rounded-2xl border border-red-800/30 p-6 md:p-8 mb-10">
+            <form id="searchForm" class="flex flex-col md:flex-row gap-4 items-end">
+                <div class="flex-1 w-full relative">
+                    <i class="fas fa-id-card field-icon"></i>
+                    <input type="text" id="dniInput" class="field" placeholder="Ingresa tu DNI (8 dígitos)" required
+                        maxlength="20" />
+                </div>
+                <button type="submit"
+                    class="btn-primary text-white font-bold px-8 py-3 rounded-xl w-full md:w-auto flex items-center justify-center gap-2">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </form>
+            <div id="errorMsg" class="text-red-400 text-sm mt-3 hidden"><i class="fas fa-exclamation-circle mr-1"></i>
+                <span id="errorText"></span></div>
+        </div>
+
+        <!-- RESULTADOS -->
+        <div id="resultsContainer">
+            <!-- Aquí se mostrarán las tarjetas de reservas o el mensaje de "sin reservas" -->
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-black border-t border-red-900/30 py-8 mt-16">
+        <div
+            class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+            <div class="text-xl font-extrabold"><span class="text-red-600">ILLARIY</span> <span
+                    class="text-white font-light">Travel</span></div>
+            <div class="flex gap-6"><a href="#" class="hover:text-red-400">Política de privacidad</a><a href="#"
+                    class="hover:text-red-400">Términos y condiciones</a></div>
+            <p>© 2026 Illariy Peru Travel Group Huancayo</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE = 'https://illary.bsite.net/api';
+        const form = document.getElementById('searchForm');
+        const dniInput = document.getElementById('dniInput');
+        const errorMsg = document.getElementById('errorMsg');
+        const errorText = document.getElementById('errorText');
+        const resultsContainer = document.getElementById('resultsContainer');
+
+        // ─── FUNCIONES AUXILIARES ──────────────────────────────────────────
+        function mostrarError(texto) {
+            errorText.textContent = texto;
+            errorMsg.classList.remove('hidden');
+        }
+
+        function ocultarError() {
+            errorMsg.classList.add('hidden');
+        }
+
+        function formatearFecha(fechaStr) {
+            if (!fechaStr) return '—';
+            // Si viene en formato "DD/MM/YYYY" o "YYYY-MM-DD"
+            if (fechaStr.includes('/')) {
+                const [d, m, y] = fechaStr.split('/');
+                return `${d}/${m}/${y}`;
+            }
+            const parts = fechaStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return fechaStr;
+        }
+
+        function estadoClase(estado) {
+            const map = {
+                'Confirmada': 'badge-confirmada',
+                'Pendiente': 'badge-pendiente',
+                'Cancelada': 'badge-cancelada',
+                'Finalizada': 'badge-finalizada'
+            };
+            return map[estado] || 'badge-pendiente';
+        }
+
+        // ─── BUSCAR CLIENTE POR DNI ──────────────────────────────────────
+        async function buscarClientePorDNI(dni) {
+            try {
+                // Obtenemos todos los clientes (no es óptimo, pero es lo que hay)
+                const res = await fetch(`${API_BASE}/Cliente`);
+                if (!res.ok) throw new Error('No se pudo obtener la lista de clientes.');
+                const clientes = await res.json();
+                // Buscar por pasaporte (campo que usamos para DNI)
+                const cliente = clientes.find(c => c.pasaporte && c.pasaporte.trim() === dni.trim());
+                return cliente || null;
+            } catch (err) {
+                console.error('Error buscando cliente:', err);
+                throw err;
+            }
+        }
+
+        // ─── OBTENER RESERVAS POR CLIENTE ────────────────────────────────
+        async function obtenerReservasPorCliente(idCliente) {
+            try {
+                // Si existe endpoint específico, usarlo; si no, filtramos todas
+                // Intentamos primero con un endpoint que devuelva reservas por cliente
+                // Podría ser /api/Reserva/cliente/{id}
+                // Si no, usamos /api/Reserva y filtramos
+                let reservas = [];
+                let res = await fetch(`${API_BASE}/Reserva/cliente/${idCliente}`);
+                if (res.ok) {
+                    reservas = await res.json();
+                } else {
+                    // Fallback: obtener todas y filtrar
+                    res = await fetch(`${API_BASE}/Reserva`);
+                    if (!res.ok) throw new Error('No se pudieron obtener las reservas.');
+                    const todas = await res.json();
+                    reservas = todas.filter(r => r.iD_Cliente === idCliente || r.ID_Cliente === idCliente);
+                }
+                return reservas;
+            } catch (err) {
+                console.error('Error obteniendo reservas:', err);
+                throw err;
+            }
+        }
+
+        // ─── OBTENER DETALLES DE PAQUETE ─────────────────────────────────
+        async function obtenerPaquete(idPaquete) {
+            try {
+                const res = await fetch(`${API_BASE}/Paquete/${idPaquete}`);
+                if (!res.ok) return null;
+                return await res.json();
+            } catch {
+                return null;
+            }
+        }
+
+        // ─── RENDERIZAR RESERVAS ──────────────────────────────────────────
+        async function renderReservas(reservas, cliente) {
+            if (!reservas || reservas.length === 0) {
+                resultsContainer.innerHTML = `
+                <div class="text-center py-16">
+                    <i class="fas fa-inbox text-5xl text-gray-500 mb-4"></i>
+                    <p class="text-xl font-semibold text-gray-300">No tienes reservas registradas</p>
+                    <p class="text-gray-500">Explora nuestros paquetes y vive una nueva aventura.</p>
+                    <a href="destinos.html" class="inline-block mt-4 bg-red-700 hover:bg-red-800 text-white px-6 py-2 rounded-full">Ver paquetes</a>
+                </div>
+                `;
+                            return;
+                        }
+
+                        let html = `
+                <div class="mb-6 flex items-center justify-between">
+                <h2 class="text-2xl font-black text-white">Tus reservas (${reservas.length})</h2>
+                <span class="text-sm text-gray-400">Cliente: <strong class="text-white">${cliente.nombre} ${cliente.apellido}</strong></span>
+                </div>
+                <div class="grid gap-6">
+            `;
+
+            // Ordenar por fecha descendente (más reciente primero)
+            reservas.sort((a, b) => new Date(b.fecha_Reserva || b.Fecha_Reserva) - new Date(a.fecha_Reserva || a.Fecha_Reserva));
+
+            // Procesar cada reserva (cargar paquete) - ahora con async/await dentro del map
+            const promesas = reservas.map(async (reserva) => {
+                const idPaq = reserva.iD_Paquete || reserva.ID_Paquete;
+                const paquete = await obtenerPaquete(idPaq);
+                const nombrePaq = paquete ? paquete.nombre : 'Paquete no disponible';
+                const precioTotal = reserva.precio_Total || reserva.Precio_Total || 0;
+                const fechaReserva = formatearFecha(reserva.fecha_Reserva || reserva.Fecha_Reserva);
+                const estado = reserva.estado || reserva.Estado || 'Pendiente';
+                const personas = reserva.numero_Personas || reserva.Numero_Personas || 0;
+
+                return `
+                <div class="reserva-card">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">${nombrePaq}</h3>
+                        <div class="flex flex-wrap gap-3 text-sm text-gray-400 mt-1">
+                        <span><i class="far fa-calendar-alt text-red-500 mr-1"></i> ${fechaReserva}</span>
+                        <span><i class="fas fa-users text-red-500 mr-1"></i> ${personas} personas</span>
+                        <span><i class="fas fa-tag text-red-500 mr-1"></i> S/ ${precioTotal.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="badge-estado ${estadoClase(estado)}">${estado}</span>
+                        <a href="destino-single.html?iD_Paquete=${idPaq}" class="text-red-400 hover:text-red-300 text-sm font-semibold underline">Ver paquete</a>
+                    </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            const tarjetas = await Promise.all(promesas);
+            html += tarjetas.join('');
+            html += `</div>`;
+            resultsContainer.innerHTML = html;
+        }
+
+        // ─── MANEJAR BÚSQUEDA ─────────────────────────────────────────────
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            ocultarError();
+            const dni = dniInput.value.trim();
+            if (!dni || dni.length < 8) {
+                mostrarError('Por favor, ingresa un DNI válido (mínimo 8 dígitos).');
+                return;
+            }
+
+            // Mostrar indicador de carga
+            resultsContainer.innerHTML = `
+        <div class="text-center py-12">
+          <div class="spinner-border text-red-500" style="width:3rem;height:3rem;" role="status">
+            <span class="sr-only">Cargando...</span>
+          </div>
+          <p class="mt-3 text-gray-400">Buscando tus reservas...</p>
+        </div>
+      `;
+
+            try {
+                // 1. Obtener cliente
+                const cliente = await buscarClientePorDNI(dni);
+                if (!cliente) {
+                    resultsContainer.innerHTML = '';
+                    mostrarError('No se encontró un cliente con ese DNI. ¿Ya te has registrado?');
+                    return;
+                }
+
+                // 2. Obtener reservas
+                const idCliente = cliente.iD_Cliente || cliente.ID_Cliente;
+                const reservas = await obtenerReservasPorCliente(idCliente);
+
+                // 3. Renderizar
+                renderReservas(reservas, cliente);
+
+            } catch (err) {
+                resultsContainer.innerHTML = '';
+                mostrarError('Ocurrió un error al consultar tus reservas. Intenta nuevamente más tarde.');
+                console.error(err);
+            }
+        });
+
+        // ─── ESTILO PARA SPINNER ──────────────────────────────────────────
+        const style = document.createElement('style');
+        style.textContent = `
+      .spinner-border {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        border: 0.25rem solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spinner-border .75s linear infinite;
+      }
+      @keyframes spinner-border {
+        to { transform: rotate(360deg); }
+      }
+    `;
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>
