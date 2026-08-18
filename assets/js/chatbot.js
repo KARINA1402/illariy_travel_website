@@ -1,6 +1,4 @@
 // ==================== CONFIGURACIÓN AVANZADA ====================
-// const GROQ_API_KEY = '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';
-// const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const WHATSAPP_NUMBER = '51990693358';
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=Hola%2C%20necesito%20ayuda%20con%20un%20tour%20y%20pago`;
 const UBICACION_NOMBRE = 'Jr. Puno 293, Huancayo';
@@ -528,7 +526,6 @@ async function enviarMensaje() {
 
 async function consultarGroq(pregunta) {
     try {
-        // Ajusta la URL según la ruta de tu API (si está en el mismo dominio, usa ruta relativa)
         const response = await fetch('https://illary.bsite.net/api/Chat/consultar', {
             method: 'POST',
             headers: {
@@ -551,7 +548,7 @@ async function consultarGroq(pregunta) {
         return data.respuesta;
     } catch (error) {
         console.error('Error al consultar el chat:', error);
-        throw error; // Re-lanza para que lo maneje el código que llama a esta función
+        throw error;
     }
 }
 
