@@ -234,7 +234,7 @@
 
   <script>
     // ═══════════════════ CONFIGURACIÓN VERIFICAPE ═══════════════════
-    const VERIFICAPE_API = 'https://illary.somee.com/api/VerificaPe/v2/dni';
+    const VERIFICAPE_API = 'https://illary.bsite.net/api/VerificaPe/v2/dni';
     let dniCache = {};
 
     async function verificarDNIReniec(dni) {
@@ -383,12 +383,12 @@
         pasaporte: document.getElementById("pasaporte").value,
       };
 
-      fetch(`https://illary.somee.com/api/Cliente/email?correo=${encodeURIComponent(cliente.correo)}`)
+      fetch(`https://illary.bsite.net/api/Cliente/email?correo=${encodeURIComponent(cliente.correo)}`)
         .then(checkRes => {
           if (checkRes.ok) {
             throw new Error("Ya eres un cliente registrado.");
           } else if (checkRes.status === 404) {
-            return fetch("https://illary.somee.com/api/Cliente", {
+            return fetch("https://illary.bsite.net/api/Cliente", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(cliente)

@@ -7,7 +7,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const API_BASE = 'https://illary.somee.com/api';
+  const API_BASE = 'https://illary.bsite.net/api/';
   const grid = document.getElementById('paquetes-grid');
   const searchInput = document.getElementById('search-input');
   const filterTipo = document.getElementById('filter-tipo');

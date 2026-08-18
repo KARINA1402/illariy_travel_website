@@ -1,10 +1,10 @@
 // ==================== CONFIGURACIÓN AVANZADA ====================
-const GROQ_API_KEY = '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';
-const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+// const GROQ_API_KEY = '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';
+// const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const WHATSAPP_NUMBER = '51990693358';
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=Hola%2C%20necesito%20ayuda%20con%20un%20tour%20y%20pago`;
 const UBICACION_NOMBRE = 'Jr. Puno 293, Huancayo';
-const API_PAQUETES = 'https://illary.somee.com/api/Paquete';
+const API_PAQUETES = 'https://illary.bsite.net/api/Paquete';
 const EMPRESA_RUC = '20603181621';
 const EMPRESA_NOMBRE = 'ILLARIY PERU TRAVEL GROUP E.I.R.L.';
 
@@ -527,69 +527,32 @@ async function enviarMensaje() {
 }
 
 async function consultarGroq(pregunta) {
-    const paquetesInfo = paquetes.map(p => 
-        `- ${p.nombre} | ${p.tipo} | ${p.duracion} | S/${p.precio_Base} | ${p.descripcion?.substring(0, 80) || ''}`
-    ).join('\n');
-    
-    const historialStr = historial.slice(-6).map(m => 
-        `${m.role === 'user' ? 'Usuario' : 'Killa'}: ${m.content}`
-    ).join('\n');
-    
-    // CAMBIO: prompt optimizado con detección de finalización
-    const systemPrompt = `
-Eres Killa, asesora de viajes de Illariy Travel. Hablas como una amiga, con respuestas de longitud variable según la intención del usuario.
-NUNCA empieces con "Hola" a menos que sea la primera interacción.
-Usa el nombre "${nombreUsuario || 'viajero'}" solo de vez en cuando.
+    try {
+        // Ajusta la URL según la ruta de tu API (si está en el mismo dominio, usa ruta relativa)
+        const response = await fetch('https://illary.bsite.net/api/Chat/consultar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                pregunta: pregunta,
+                nombre: nombreUsuario,
+                historial: historial.slice(-6),
+                paquetes: paquetes
+            })
+        });
 
-**Paquetes disponibles:**
-${paquetesInfo || 'No hay paquetes cargados'}
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
 
-**Conversación reciente:**
-${historialStr}
-
-**Datos empresa:**
-- Razón Social: ${EMPRESA_NOMBRE}
-- RUC: ${EMPRESA_RUC}
-- Dirección: ${UBICACION_NOMBRE}
-- WhatsApp: +51 ${WHATSAPP_NUMBER}
-
-**RESTRICCIONES MUY IMPORTANTES:**
-- NUNCA digas que vas a enviar correos electrónicos, enlaces de pago por correo, SMS, ni ningún tipo de comunicación automática.
-- NUNCA inventes procesos de pago online.
-- NUNCA proporciones enlaces falsos.
-- Mantente dentro de tu rol: recomendar paquetes, dar precios, duración, descripciones, ubicación, RUC.
-
-**ESTRATEGIA DE LONGITUD DE RESPUESTA (evalúa cada mensaje y aplica):**
-1. **Pregunta muy concreta** (precio exacto, duración, ¿hay tour mañana?): responde en **1 oración**, máximo 2 frases cortas.
-2. **Pregunta abierta pero sin detalles** (recomiéndame algo, quiero un tour barato, qué tours tienen): responde **2-3 frases** mencionando 1 o 2 paquetes con nombre, precio y duración, sin descripciones extensas.
-3. **Pregunta con interés explícito** (cuéntame más de..., qué incluye, cómo es la experiencia, detalles): puedes extenderte a **4-5 frases** con detalles relevantes pero sin repetir información.
-4. **Tema no turístico**: respuesta breve + "¿Hablamos de algún destino?".
-5. **Cuando el usuario pida "ver paquetes"**: solo lista nombre + precio, una línea por paquete. Nada de descripciones adicionales.
-6. **CIERRE DE CONVERSACIÓN** (cuando el usuario diga frases como "eso es todo", "nada más", "gracias por todo", "hasta luego", "adiós", "chau", o demuestre que ya ha terminado): despídete cálidamente **SIN hacer ninguna pregunta**. Ejemplo: "¡Un placer ayudarte, ${nombreUsuario}! Que tengas un excelente día 😊." No sugieras nada más.
-
-NUNCA repitas la misma información en varias frases. Sé directa y cálida, pero ahorra palabras cuando no sean necesarias.
-Siempre termina con una pregunta amable y breve, **excepto si detectas que el usuario ya se está despidiendo**.
-
-**Pregunta del usuario:** ${pregunta}
-`;
-    
-    const response = await fetch(GROQ_API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${GROQ_API_KEY}`
-        },
-        body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            messages: [{ role: 'system', content: systemPrompt }],
-            temperature: 0.5,
-            max_tokens: 200
-        })
-    });
-    
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    return data.choices[0].message.content;
+        const data = await response.json();
+        return data.respuesta;
+    } catch (error) {
+        console.error('Error al consultar el chat:', error);
+        throw error; // Re-lanza para que lo maneje el código que llama a esta función
+    }
 }
 
 function escapeHtml(str) {
