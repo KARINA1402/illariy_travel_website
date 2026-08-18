@@ -388,7 +388,6 @@
       }
     }
 
-    /* Mensajes RENIEC y autocompletado */
     .info-msg {
       font-size: 12px;
       margin-top: 4px;
@@ -1005,6 +1004,105 @@
     let dniCache = {};
     let dniClienteCache = {};
 
+    // ═══════════════════════════════════════════════════════════════════
+    // FUNCIONES AUXILIARES DE VALIDACIÓN DE FECHAS
+    // ═══════════════════════════════════════════════════════════════════
+
+    function parseFecha(fechaStr) {
+      if (!fechaStr) return null;
+      const partes = fechaStr.split('/');
+      if (partes.length === 3) {
+        const dia = parseInt(partes[0], 10);
+        const mes = parseInt(partes[1], 10) - 1;
+        const anio = parseInt(partes[2], 10);
+        const fecha = new Date(anio, mes, dia);
+        return isNaN(fecha.getTime()) ? null : fecha;
+      }
+      return null;
+    }
+
+    function fechasSeCruzan(inicio1, fin1, inicio2, fin2) {
+      if (!inicio1 || !fin1 || !inicio2 || !fin2) return false;
+      const fin2ConMargen = new Date(fin2);
+      fin2ConMargen.setDate(fin2ConMargen.getDate() + 1);
+      return inicio1 <= fin2ConMargen && inicio2 <= fin1;
+    }
+
+    function esDuplicado(idPaqNuevo, inicioNuevo, finNuevo, idPaqExistente, inicioExistente, finExistente) {
+      return (
+        idPaqNuevo === idPaqExistente &&
+        inicioNuevo.getTime() === inicioExistente.getTime() &&
+        finNuevo.getTime() === finExistente.getTime()
+      );
+    }
+
+    /**
+     * Verifica si el cliente tiene reservas duplicadas o con cruce de fechas.
+     * @param {number} idCliente - ID del cliente (debe estar ya existente en BD)
+     * @param {number} idPaquete - ID del paquete a reservar
+     * @param {Date} fechaInicio - Fecha de inicio del nuevo paquete
+     * @param {Date} fechaFin - Fecha de fin del nuevo paquete
+     * @returns {Promise<{conflict: boolean, tipo: string, mensaje: string}>}
+     */
+    async function verificarConflictosReserva(idCliente, idPaquete, fechaInicio, fechaFin) {
+      if (!idCliente) return { conflict: false, tipo: null, mensaje: '' };
+
+      // 1. Obtener reservas del cliente
+      const resReservas = await fetch(`${API}/Reserva/cliente/${idCliente}`);
+      let reservas = [];
+      if (resReservas.ok) {
+        reservas = await resReservas.json();
+      } else {
+        // Fallback: obtener todas y filtrar
+        const resAll = await fetch(`${API}/Reserva`);
+        if (!resAll.ok) throw new Error('No se pudieron obtener las reservas.');
+        const todas = await resAll.json();
+        reservas = todas.filter(r => (r.iD_Cliente || r.ID_Cliente) === idCliente);
+      }
+
+      if (reservas.length === 0) return { conflict: false, tipo: null, mensaje: '' };
+
+      // 2. Obtener catálogo de paquetes
+      const resPaquetes = await fetch(`${API}/Paquete`);
+      if (!resPaquetes.ok) throw new Error('No se pudo obtener la lista de paquetes.');
+      const paquetes = await resPaquetes.json();
+
+      // 3. Recorrer reservas y comparar
+      for (const reserva of reservas) {
+        const idPaqReserva = reserva.iD_Paquete || reserva.ID_Paquete;
+        const paqueteReserva = paquetes.find(p => (p.iD_Paquete || p.ID_Paquete) === idPaqReserva);
+        if (!paqueteReserva) continue;
+
+        const fechaInicioExistente = parseFecha(paqueteReserva.fecha_Inicio || paqueteReserva.Fecha_Inicio);
+        const fechaFinExistente = parseFecha(paqueteReserva.fecha_Fin || paqueteReserva.Fecha_Fin);
+        if (!fechaInicioExistente || !fechaFinExistente) continue;
+
+        // Duplicado exacto
+        if (esDuplicado(idPaquete, fechaInicio, fechaFin, idPaqReserva, fechaInicioExistente, fechaFinExistente)) {
+          return {
+            conflict: true,
+            tipo: 'duplicado',
+            mensaje: `Ya tienes una reserva exacta para "${paqueteReserva.nombre}" con las mismas fechas.`
+          };
+        }
+
+        // Cruce de fechas (con margen)
+        if (fechasSeCruzan(fechaInicio, fechaFin, fechaInicioExistente, fechaFinExistente)) {
+          return {
+            conflict: true,
+            tipo: 'cruce',
+            mensaje: `Este paquete tiene cruce de fecha con tu reserva "${paqueteReserva.nombre}" (${paqueteReserva.fecha_Inicio} - ${paqueteReserva.fecha_Fin}). Por favor, elige otro paquete o ajusta las fechas.`
+          };
+        }
+      }
+
+      return { conflict: false, tipo: null, mensaje: '' };
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // RESTO DEL CÓDIGO (carga de paquete, formularios, validaciones, etc.)
+    // ═══════════════════════════════════════════════════════════════════
+
     document.addEventListener('DOMContentLoaded', () => {
       const id = new URLSearchParams(location.search).get('iD_Paquete');
       if (!id) mostrarPkgError();
@@ -1023,10 +1121,12 @@
         document.getElementById('checkout-main').classList.remove('hidden');
       } catch (e) { mostrarPkgError(); }
     }
+
     function mostrarPkgError() {
       document.getElementById('pkg-loading').classList.add('hidden');
       document.getElementById('pkg-error').classList.remove('hidden');
     }
+
     function renderPaquete() {
       document.getElementById('pkg-img').src = paquete.imagen || 'assets/img/bus.jpg';
       document.getElementById('pkg-nombre').innerText = paquete.nombre;
@@ -1036,6 +1136,7 @@
       document.getElementById('pkg-precio').innerText = `S/ ${(paquete.precio_Base || 0).toFixed(2)}`;
       document.getElementById('summary-pkg-nombre').innerText = paquete.nombre;
     }
+
     function changePasajeros(delta) {
       let nuevo = Math.max(1, Math.min(20, numeroPax + delta));
       if (nuevo === numeroPax) return;
@@ -1044,6 +1145,7 @@
       renderPasajeros();
       actualizarResumen();
     }
+
     function renderPasajeros() {
       const container = document.getElementById('pasajeros-container');
       let current = container.children.length;
@@ -1133,6 +1235,7 @@
       if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
       return edad;
     }
+
     function validarEdadPasajero(idx, input) {
       const isTitular = idx === 0;
       const msgEl = document.getElementById(`pax-${idx}-edad-msg`);
@@ -1437,9 +1540,6 @@
     }
 
     /* ═══════════════════════════ FORMATO DE FECHA ══════════════════════════════ */
-    /**
-     * Retorna la fecha actual en formato "31/05/2026 11:24 pm" (hora exacta, 12h)
-     */
     function formatearFechaReserva() {
       const ahora = new Date();
       const dia = String(ahora.getDate()).padStart(2, '0');
@@ -1448,7 +1548,7 @@
       let horas = ahora.getHours();
       const minutos = String(ahora.getMinutes()).padStart(2, '0');
       const ampm = horas >= 12 ? 'pm' : 'am';
-      horas = horas % 12 || 12; // 0 se convierte en 12 (medianoche)
+      horas = horas % 12 || 12;
       return `${dia}/${mes}/${anio} ${String(horas).padStart(2, '0')}:${minutos} ${ampm}`;
     }
 
@@ -1461,73 +1561,8 @@
       spn.classList.toggle('hidden', !loading);
     }
 
-    /**
- * Verifica si el cliente tiene reservas duplicadas o con cruce de fechas.
- * @param {number} idCliente - ID del cliente (debe estar ya existente en BD)
- * @param {number} idPaquete - ID del paquete a reservar
- * @param {Date} fechaInicio - Fecha de inicio del nuevo paquete
- * @param {Date} fechaFin - Fecha de fin del nuevo paquete
- * @returns {Promise<{conflict: boolean, tipo: string, mensaje: string}>}
- */
-    async function verificarConflictosReserva(idCliente, idPaquete, fechaInicio, fechaFin) {
-      // Si no hay ID de cliente, no se puede validar (pero debería ocurrir solo si es nuevo)
-      if (!idCliente) return { conflict: false, tipo: null, mensaje: '' };
-
-      // 1. Obtener reservas del cliente
-      const resReservas = await fetch(`${API}/Reserva/cliente/${idCliente}`);
-      let reservas = [];
-      if (resReservas.ok) {
-        reservas = await resReservas.json();
-      } else {
-        // Fallback: obtener todas y filtrar
-        const resAll = await fetch(`${API}/Reserva`);
-        if (!resAll.ok) throw new Error('No se pudieron obtener las reservas.');
-        const todas = await resAll.json();
-        reservas = todas.filter(r => (r.iD_Cliente || r.ID_Cliente) === idCliente);
-      }
-
-      if (reservas.length === 0) return { conflict: false, tipo: null, mensaje: '' };
-
-      // 2. Obtener catálogo de paquetes (para saber fechas de cada reserva)
-      const resPaquetes = await fetch(`${API}/Paquete`);
-      if (!resPaquetes.ok) throw new Error('No se pudo obtener la lista de paquetes.');
-      const paquetes = await resPaquetes.json();
-
-      // 3. Recorrer reservas y comparar
-      for (const reserva of reservas) {
-        const idPaqReserva = reserva.iD_Paquete || reserva.ID_Paquete;
-        const paqueteReserva = paquetes.find(p => (p.iD_Paquete || p.ID_Paquete) === idPaqReserva);
-        if (!paqueteReserva) continue;
-
-        const fechaInicioExistente = parseFecha(paqueteReserva.fecha_Inicio || paqueteReserva.Fecha_Inicio);
-        const fechaFinExistente = parseFecha(paqueteReserva.fecha_Fin || paqueteReserva.Fecha_Fin);
-        if (!fechaInicioExistente || !fechaFinExistente) continue;
-
-        // Duplicado exacto
-        if (esDuplicado(idPaquete, fechaInicio, fechaFin, idPaqReserva, fechaInicioExistente, fechaFinExistente)) {
-          return {
-            conflict: true,
-            tipo: 'duplicado',
-            mensaje: `Ya tienes una reserva exacta para "${paqueteReserva.nombre}" con las mismas fechas.`
-          };
-        }
-
-        // Cruce de fechas (con margen)
-        if (fechasSeCruzan(fechaInicio, fechaFin, fechaInicioExistente, fechaFinExistente)) {
-          return {
-            conflict: true,
-            tipo: 'cruce',
-            mensaje: `Este paquete tiene cruze de fecha con tu reserva "${paqueteReserva.nombre}" (${paqueteReserva.fecha_Inicio} - ${paqueteReserva.fecha_Fin}). Por favor, elige otro paquete o ajusta las fechas.`
-          };
-        }
-      }
-
-      return { conflict: false, tipo: null, mensaje: '' };
-    }
-
     /* ═══════════════════════════ PROCESAR PAGO ═════════════════════════════════ */
     async function procesarPago() {
-      // ─── 1. OBTENER DATOS DEL TITULAR ──────────────────────────────
       const titular = getDatosPasajero(0);
       if (!titular) {
         alert('No se pudieron obtener los datos del titular.');
@@ -1538,7 +1573,6 @@
         return;
       }
 
-      // ─── 2. VALIDAR TARJETA (antes de cualquier proceso pesado) ──────
       if (!validarTarjeta()) {
         return;
       }
@@ -1551,7 +1585,6 @@
       }
 
       try {
-        // ─── 3. DATOS DEL PAQUETE ──────────────────────────────────────
         if (!paquete) {
           throw new Error('No se encontró la información del paquete.');
         }
@@ -1563,21 +1596,19 @@
           throw new Error('No se encontró el ID del paquete.');
         }
 
-        // ─── 4. CALCULAR TOTAL ─────────────────────────────────────────
         const precioBase = Number(paquete.precio_Base || 0);
         const total = precioBase * numeroPax;
         if (total <= 0) {
           throw new Error('El importe de la reserva no es válido.');
         }
 
-        // ─── 5. OBTENER O CREAR CLIENTE ────────────────────────────────
         const idCliente = await obtenerOCrearCliente(titular);
         if (!idCliente) {
           throw new Error('No se pudo obtener el ID del cliente.');
         }
         console.log('Cliente obtenido:', idCliente);
 
-        // ─── 6. VALIDAR CONFLICTOS DE FECHAS (duplicados y cruces) ────
+        // Validar conflictos de fechas
         const fechaInicio = parseFecha(paquete.fecha_Inicio);
         const fechaFin = parseFecha(paquete.fecha_Fin);
         if (fechaInicio && fechaFin) {
@@ -1594,12 +1625,10 @@
           }
         }
 
-        // ─── 7. CONSTRUIR PAYLOAD ──────────────────────────────────────
         const correoTitular = titular.correo.trim();
         const fechaReserva = formatearFechaReserva();
         const numeroTransaccion = `ILL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-        // Construir acompañantes
         const acompanantes = [];
         for (let i = 1; i < numeroPax; i++) {
           const pasajero = getDatosPasajero(i);
@@ -1658,7 +1687,6 @@
 
         console.log('ENVIANDO RESERVA AL BACKEND', payload);
 
-        // ─── 8. ENVIAR AL BACKEND ─────────────────────────────────────
         const urlConfirmar = `${API}/Reserva/confirmar`;
         const resConfirm = await fetch(urlConfirmar, {
           method: 'POST',
@@ -1693,11 +1721,9 @@
           console.warn('El backend no devolvió id_Reserva.', response);
         }
 
-        // ─── 9. CERRAR MODAL Y MOSTRAR BOLETA ──────────────────────────
         cerrarModalPago();
         mostrarBoleta(idReserva, total, titular, numeroTransaccion, fechaReserva);
 
-        // ─── 10. RESULTADO DEL ENVÍO DE CORREO ────────────────────────
         const correoEnviado = response.correoEnviado === true || response.CorreoEnviado === true;
         console.log('¿Correo enviado?:', correoEnviado);
         console.log('Correo destino:', correoTitular);
@@ -1723,297 +1749,113 @@
     }
 
     async function obtenerOCrearCliente(titular) {
-
       if (!titular) {
-        throw new Error(
-          'No se recibieron los datos del titular.'
-        );
+        throw new Error('No se recibieron los datos del titular.');
       }
 
-      const correo =
-        (titular.correo || '').trim();
-
-      const dniTitular =
-        (titular.pasaporte || titular.dni || '').trim();
+      const correo = (titular.correo || '').trim();
+      const dniTitular = (titular.pasaporte || titular.dni || '').trim();
 
       if (!correo) {
-        throw new Error(
-          'El correo electrónico del titular es obligatorio.'
-        );
+        throw new Error('El correo electrónico del titular es obligatorio.');
       }
 
-      // ============================================
-      // 1. BUSCAR EN CACHE POR DNI
-      // ============================================
-      if (
-        typeof dniClienteCache !== 'undefined' &&
-        dniTitular &&
-        dniClienteCache[dniTitular]?.id
-      ) {
-
-        const cliente =
-          dniClienteCache[dniTitular];
-
-        console.log(
-          'Cliente encontrado en cache por DNI:',
-          cliente.id
-        );
-
-        return cliente.id;
+      // Cache por DNI
+      if (typeof dniClienteCache !== 'undefined' && dniTitular && dniClienteCache[dniTitular]?.id) {
+        console.log('Cliente encontrado en cache por DNI:', dniClienteCache[dniTitular].id);
+        return dniClienteCache[dniTitular].id;
       }
 
-      // ============================================
-      // 2. BUSCAR EN CACHE POR CORREO
-      // ============================================
-      if (
-        typeof clienteCache !== 'undefined' &&
-        clienteCache[correo]?.id
-      ) {
-
-        const cliente =
-          clienteCache[correo];
-
-        console.log(
-          'Cliente encontrado en cache por correo:',
-          cliente.id
-        );
-
-        return cliente.id;
+      // Cache por Correo
+      if (typeof clienteCache !== 'undefined' && clienteCache[correo]?.id) {
+        console.log('Cliente encontrado en cache por correo:', clienteCache[correo].id);
+        return clienteCache[correo].id;
       }
 
-      // ============================================
-      // 3. BUSCAR CLIENTE EN BACKEND POR CORREO
-      // ============================================
+      // Buscar en backend por correo
       try {
-
-        const url =
-          `${API}/Cliente/email?correo=${encodeURIComponent(correo)}`;
-
-        console.log(
-          'Buscando cliente:',
-          url
-        );
-
-        const resCheck =
-          await fetch(url);
+        const url = `${API}/Cliente/email?correo=${encodeURIComponent(correo)}`;
+        console.log('Buscando cliente:', url);
+        const resCheck = await fetch(url);
 
         if (resCheck.ok) {
-
-          /*
-           * Tu backend aparentemente tiene
-           * el endpoint /Cliente/email.
-           *
-           * Luego mantenemos la búsqueda de la
-           * lista para conservar la lógica actual.
-           */
-          const listaRes =
-            await fetch(`${API}/Cliente`);
-
+          const listaRes = await fetch(`${API}/Cliente`);
           if (listaRes.ok) {
-
-            const lista =
-              await listaRes.json();
-
-            const cliente =
-              lista.find(c => {
-
-                const email =
-                  c.correo ||
-                  c.Correo ||
-                  '';
-
-                return (
-                  email.trim().toLowerCase() ===
-                  correo.toLowerCase()
-                );
-              });
-
+            const lista = await listaRes.json();
+            const cliente = lista.find(c => {
+              const email = c.correo || c.Correo || '';
+              return email.trim().toLowerCase() === correo.toLowerCase();
+            });
             if (cliente) {
-
-              const id =
-                cliente.iD_Cliente ||
-                cliente.ID_Cliente;
-
+              const id = cliente.iD_Cliente || cliente.ID_Cliente;
               if (id) {
-
-                if (
-                  typeof clienteCache !== 'undefined'
-                ) {
-
-                  clienteCache[correo] = {
-                    id: id,
-                    data: cliente
-                  };
+                if (typeof clienteCache !== 'undefined') {
+                  clienteCache[correo] = { id: id, data: cliente };
                 }
-
-                if (
-                  typeof dniClienteCache !== 'undefined' &&
-                  dniTitular
-                ) {
-
-                  dniClienteCache[dniTitular] = {
-                    id: id,
-                    data: cliente
-                  };
+                if (typeof dniClienteCache !== 'undefined' && dniTitular) {
+                  dniClienteCache[dniTitular] = { id: id, data: cliente };
                 }
-
-                console.log(
-                  'Cliente existente:',
-                  id
-                );
-
+                console.log('Cliente existente:', id);
                 return id;
               }
             }
           }
         }
-
       } catch (error) {
-
-        console.warn(
-          'Error buscando cliente por correo:',
-          error
-        );
-
-        /*
-         * No detenemos aquí el proceso.
-         * Intentaremos crear el cliente.
-         */
+        console.warn('Error buscando cliente por correo:', error);
       }
 
-      // ============================================
-      // 4. CREAR NUEVO CLIENTE
-      // ============================================
+      // Crear nuevo cliente
       const nuevoCliente = {
-
         iD_Usuario: 1,
-
-        frecuencia_Viajero:
-          'Normal',
-
-        correo:
-          correo,
-
-        nombre:
-          titular.nombre || '',
-
-        apellido:
-          titular.apellido || '',
-
-        telefono:
-          titular.telefono || '',
-
-        direccion:
-          titular.direccion || '',
-
-        nacionalidad:
-          titular.nacionalidad || '',
-
-        pasaporte:
-          titular.pasaporte ||
-          titular.dni ||
-          '',
-
-        fecha_Nacimiento:
-          titular.fechaNac
-            ? new Date(
-              titular.fechaNac
-            ).toLocaleDateString('es-PE')
-            : ''
+        frecuencia_Viajero: 'Normal',
+        correo: correo,
+        nombre: titular.nombre || '',
+        apellido: titular.apellido || '',
+        telefono: titular.telefono || '',
+        direccion: titular.direccion || '',
+        nacionalidad: titular.nacionalidad || '',
+        pasaporte: titular.pasaporte || titular.dni || '',
+        fecha_Nacimiento: titular.fechaNac ? new Date(titular.fechaNac).toLocaleDateString('es-PE') : ''
       };
 
-      console.log(
-        'Creando nuevo cliente:',
-        nuevoCliente
-      );
+      console.log('Creando nuevo cliente:', nuevoCliente);
 
-      const resPost =
-        await fetch(
-          `${API}/Cliente`,
-          {
-            method: 'POST',
+      const resPost = await fetch(`${API}/Cliente`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(nuevoCliente)
+      });
 
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-
-            body:
-              JSON.stringify(nuevoCliente)
-          }
-        );
-
-      const texto =
-        await resPost.text();
-
+      const texto = await resPost.text();
       if (!resPost.ok) {
-
-        throw new Error(
-          `Error al crear cliente: ${resPost.status} - ${texto}`
-        );
+        throw new Error(`Error al crear cliente: ${resPost.status} - ${texto}`);
       }
 
       let creado;
-
       try {
-
-        creado =
-          texto
-            ? JSON.parse(texto)
-            : {};
-
+        creado = texto ? JSON.parse(texto) : {};
       } catch {
-
-        throw new Error(
-          'El backend creó el cliente pero devolvió una respuesta inválida.'
-        );
+        throw new Error('El backend creó el cliente pero devolvió una respuesta inválida.');
       }
 
-      const idCliente =
-        creado.iD_Cliente ||
-        creado.ID_Cliente;
-
+      const idCliente = creado.iD_Cliente || creado.ID_Cliente;
       if (!idCliente) {
-
-        console.error(
-          'Respuesta al crear cliente:',
-          creado
-        );
-
-        throw new Error(
-          'No se pudo obtener el ID del cliente creado.'
-        );
+        console.error('Respuesta al crear cliente:', creado);
+        throw new Error('No se pudo obtener el ID del cliente creado.');
       }
 
-      // ============================================
-      // 5. ACTUALIZAR CACHE
-      // ============================================
-      if (
-        typeof clienteCache !== 'undefined'
-      ) {
-
-        clienteCache[correo] = {
-          id: idCliente,
-          data: creado
-        };
+      if (typeof clienteCache !== 'undefined') {
+        clienteCache[correo] = { id: idCliente, data: creado };
+      }
+      if (typeof dniClienteCache !== 'undefined' && dniTitular) {
+        dniClienteCache[dniTitular] = { id: idCliente, data: creado };
       }
 
-      if (
-        typeof dniClienteCache !== 'undefined' &&
-        dniTitular
-      ) {
-
-        dniClienteCache[dniTitular] = {
-          id: idCliente,
-          data: creado
-        };
-      }
-
-      console.log(
-        'Cliente creado correctamente:',
-        idCliente
-      );
-
+      console.log('Cliente creado correctamente:', idCliente);
       return idCliente;
     }
 
@@ -2024,12 +1866,9 @@
 
       const precioUnit = Number(paquete?.precio_Base || 0);
       const fechaEmision = fechaReservaStr || formatearFechaReserva();
-      // Usamos el número de transacción real (puede venir del backend)
       const nroTransaccion = numTransaccion || `ILL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-      // Para el código de reserva usamos el mismo número de transacción
       const codigoReserva = nroTransaccion;
 
-      // Construir HTML de pasajeros (igual que antes)
       let pasajerosHtml = '';
       for (let i = 0; i < numeroPax; i++) {
         const p = getDatosPasajero(i);
